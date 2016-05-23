@@ -1911,16 +1911,19 @@
     Z.h = 0;
     Z.answer = 42;
     var gd = [KEY$trackingId, KEY$cookieDomain, KEY$name];
-    Z.create = function(a) {
-        var b = Yb(gd, [].slice.call(arguments));
+    Z.create = function(...args) {
+        var b = Yb(gd, args);
         b[KEY$name] || (b[KEY$name] = "t0");
-        var c = "" + b[KEY$name];
-        if (Z.o[c]) return MWarn("Ignoring create request for duplicate tracking name."), Z.o[c];
-        MInfo("Creating new tracker: " + c);
-        b = new ad(b);
-        Z.o[c] = b;
-        Z.C.push(b);
-        return b
+        var trackerName = "" + b[KEY$name];
+        if (Z.o[trackerName]) {
+            MWarn("Ignoring create request for duplicate tracking name.");
+            return Z.o[trackerName];
+        }
+        MInfo("Creating new tracker: " + trackerName);
+        var tracker = new Tracker(b);
+        Z.o[trackerName] = tracker;
+        Z.C.push(tracker);
+        return tracker;
     };
     Z.remove = function(a) {
         for (var b = 0; b < Z.C.length; b++)
