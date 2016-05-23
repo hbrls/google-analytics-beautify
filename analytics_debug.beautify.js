@@ -28,25 +28,25 @@
         },
         $e = function(a) {
             a = a.get(af);
-            ga(a) || (a = []);
+            isArray(a) || (a = []);
             return a
         };
-    var t = function(a) {
-            return "function" == typeof a
-        },
-        ga = function(a) {
-            return "[object Array]" == Object.prototype.toString.call(Object(a))
-        },
-        G = function(a) {
-            return void 0 != a && -1 < (a.constructor + "").indexOf("String")
-        },
-        H = function(a, b) {
-            return 0 == a.indexOf(b)
-        },
-        xa = function(a) {
-            return a ? a.replace(/^[\s\xa0]+|[\s\xa0]+$/g, "") : ""
-        },
-        za = function(a) {
+    var isFunction = function (a) {
+        return "function" == typeof a;
+    };
+    var isArray = function (a) {
+        return "[object Array]" == Object.prototype.toString.call(Object(a));
+    };
+    var isString = function (a) {
+        return undefined != a && -1 < (a.constructor + "").indexOf("String");
+    };
+    var startsWith = function(a, b) {
+        return 0 == a.indexOf(b);
+    };
+    var trim = function (a) {
+        return a ? a.replace(/^[\s\xa0]+|[\s\xa0]+$/g, "") : "";
+    };
+    var za = function(a) {
             var b = I.createElement("img");
             b.width = 1;
             b.height = 1;
@@ -272,7 +272,7 @@
             for (var b = 0; b < Rd.length; b++) {
                 var c = Rd[b].V,
                     d = Rd[b].W;
-                if (G(c)) {
+                if (isString(c)) {
                     if (c == a) return d
                 } else if (c = a.match(c)) return c[0] =
                     d, Ha.apply(void 0, c)
@@ -380,9 +380,9 @@
     function Fa(a, b) {
         var c = b || 0;
         if (void 0 == a) return "" + a;
-        if (G(a)) return '"' + a + '"';
-        if (t(a)) return "[function]";
-        if (ga(a)) {
+        if (isString(a)) return '"' + a + '"';
+        if (isFunction(a)) return "[function]";
+        if (isArray(a)) {
             if (3 < b) return "[...]";
             for (var d = [], e = 0; e < a.length; e++) d.push(Fa(a[e], c + 1));
             return "[" + d.join(", ") + "]"
@@ -397,7 +397,7 @@
     }
 
     function Ha(a, b) {
-        if (!G(a)) return "";
+        if (!isString(a)) return "";
         for (var c = a.split("%s"), d = 1; d < arguments.length; d++) c.splice(2 * d - 1, 0, Fa(arguments[d]));
         return c.join("")
     }
@@ -455,7 +455,7 @@
                 case wb:
                 case xb:
                 case Pd:
-                    G(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
+                    isString(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
                     break;
                 case yb:
                 case zb:
@@ -485,21 +485,21 @@
                 case Tb:
                 case Ub:
                 case Vb:
-                    t(b) || MWarn("Expected a function for the field value: %s. but found: %s.", a, typeof b);
+                    isFunction(b) || MWarn("Expected a function for the field value: %s. but found: %s.", a, typeof b);
                     break;
                 case T:
                     /^[a-zA-Z0-9_]+$/.test(b) || MError("Tracker name should only consist of alphanumeric characters.");
                     break;
                 case U:
                     va.test(b) || MWarn("The tracking Id should only be of the format UA-NNNNNN-N.")
-            }!/^contentGroup[0-9]+$/.test(a) && !/^dimension[0-9]+$/.test(a) || G(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
+            }!/^contentGroup[0-9]+$/.test(a) && !/^dimension[0-9]+$/.test(a) || isString(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
             !/^metric[0-9]+$/.test(a) || !isNaN(parseFloat(b)) && isFinite(b) || MWarn("Expected a number value for field: %s. but found: %s.", a, typeof b)
         }
     }
 
     function Ec(a) {
         function b(b) {
-            G(a.get(b)) || MError("Missing required field '%s' for hit of type '%s'", b, c)
+            isString(a.get(b)) || MError("Missing required field '%s' for hit of type '%s'", b, c)
         }
         var c = V(a, Ma);
         switch (c) {
@@ -659,13 +659,13 @@
             for (var b = 0; b < this.m.length; b++) {
                 MTrace("  filter[" + b + "]: " + this.m[b]);
                 var c = a.get(this.m[b]);
-                c && t(c) ? c.call(Q, a) : MTrace("  Skipping (no function found.)")
+                c && isFunction(c) ? c.call(Q, a) : MTrace("  Skipping (no function found.)")
             }
         } catch (d) {
             MTrace("Aborted execution due to exception: " + d)
         }
         b = a.get(Nb);
-        b != noop && t(b) && (MTrace("Manually firing callback"), a.set(Nb, noop, !0), setTimeout(b, 10))
+        b != noop && isFunction(b) && (MTrace("Manually firing callback"), a.set(Nb, noop, !0), setTimeout(b, 10))
     };
 
     function hc(a) {
@@ -742,7 +742,7 @@
 
     function ve(a) {
         var b = Q.gaDevIds;
-        ga(b) && 0 != b.length && a.set("&did", b.join(","), !0)
+        isArray(b) && 0 != b.length && a.set("&did", b.join(","), !0)
     }
 
     function ya(a) {
@@ -786,7 +786,7 @@
     wc.prototype.get = function(a) {
         var b = yc(a),
             c = this.data.get(a);
-        b && void 0 == c && (c = t(b.defaultValue) ? b.defaultValue() : b.defaultValue);
+        b && void 0 == c && (c = isFunction(b.defaultValue) ? b.defaultValue() : b.defaultValue);
         return b && b.v ? b.v(this, a, c) : c
     };
     var V = function(a, b) {
@@ -852,7 +852,7 @@
         Cc = function(a, b) {
             MError("Ignored attempt to update read-only property: " + b)
         };
-    var Fc = G(window.GoogleAnalyticsObject) && xa(window.GoogleAnalyticsObject) || "ga",
+    var Fc = isString(window.GoogleAnalyticsObject) && trim(window.GoogleAnalyticsObject) || "ga",
         $b = !1,
         Gc = X("apiVersion", "v"),
         Hc = X("clientVersion", "_v"),
@@ -1174,7 +1174,7 @@
 
     function Ld(a, b) {
         var c, d;
-        null == a ? c = d = 1 : (c = ic(a), d = ic(H(a, ".") ? a.substring(1) : "." + a));
+        null == a ? c = d = 1 : (c = ic(a), d = ic(startsWith(a, ".") ? a.substring(1) : "." + a));
         for (var e = 0; e < b.length; e++)
             if (b[e].hash == c || b[e].hash == d) return b[e]
     };
@@ -1399,7 +1399,7 @@
             this.filters = new gc;
             MTrace("Initializing tracker");
             b(T, a[T]);
-            b(U, xa(a[U]));
+            b(U, trim(a[U]));
             b(ub, a[ub]);
             b(S, a[S] || Wb());
             b(vb, a[vb]);
@@ -1524,13 +1524,13 @@
             if (d && a.get(Lb) && (b = I.location.hash)) {
                 b = b.split(/[?&#]+/);
                 d = [];
-                for (c = 0; c < b.length; ++c)(H(b[c], "utm_id") || H(b[c], "utm_campaign") || H(b[c], "utm_source") || H(b[c], "utm_medium") || H(b[c], "utm_term") || H(b[c], "utm_content") || H(b[c], "gclid") ||
-                    H(b[c], "dclid") || H(b[c], "gclsrc")) && d.push(b[c]);
+                for (c = 0; c < b.length; ++c)(startsWith(b[c], "utm_id") || startsWith(b[c], "utm_campaign") || startsWith(b[c], "utm_source") || startsWith(b[c], "utm_medium") || startsWith(b[c], "utm_term") || startsWith(b[c], "utm_content") || startsWith(b[c], "gclid") ||
+                    startsWith(b[c], "dclid") || startsWith(b[c], "gclsrc")) && d.push(b[c]);
                 0 < d.length && (b = "#" + d.join("&"), a.set(Pa, a.get(Pa) + b))
             }
         };
     ad.prototype.get = function(a) {
-        G(a) || MError("Please specify a field name to get it's value.");
+        isString(a) || MError("Please specify a field name to get it's value.");
         return this.a.get(a)
     };
     ad.prototype.set = function(a, b) {
@@ -1580,15 +1580,15 @@
     var qe = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/,
         se = function(a) {
             this.G = a;
-            if (t(a[0])) this.s = a[0];
+            if (isFunction(a[0])) this.s = a[0];
             else {
                 var b = qe.exec(a[0]);
-                null != b && 4 == b.length && (this.c = b[1] || "t0", this.I = b[2] || "", this.A = b[3], this.b = [].slice.call(a, 1), this.I || (this.D = "create" == this.A, this.g = "require" == this.A, this.f = "provide" == this.A, this.$ = "remove" == this.A), this.g && (3 <= this.b.length ? (this.da = this.b[1], this.ba = this.b[2]) : this.b[1] && (G(this.b[1]) ? this.da = this.b[1] : this.ba = this.b[1])));
+                null != b && 4 == b.length && (this.c = b[1] || "t0", this.I = b[2] || "", this.A = b[3], this.b = [].slice.call(a, 1), this.I || (this.D = "create" == this.A, this.g = "require" == this.A, this.f = "provide" == this.A, this.$ = "remove" == this.A), this.g && (3 <= this.b.length ? (this.da = this.b[1], this.ba = this.b[2]) : this.b[1] && (isString(this.b[1]) ? this.da = this.b[1] : this.ba = this.b[1])));
                 var b = a[1],
                     c = a[2];
                 if (!this.A) throw MError("Invalid command: " + a), "abort";
-                if (this.g && (!G(b) || "" == b)) throw MError("Invalid require command.", a), "abort";
-                if (this.f && (!G(b) || "" == b || !t(c))) throw MError("Invalid provide command.", a), "abort";
+                if (this.g && (!isString(b) || "" == b)) throw MError("Invalid require command.", a), "abort";
+                if (this.f && (!isString(b) || "" == b || !isFunction(c))) throw MError("Invalid provide command.", a), "abort";
                 if (re(this.c) || re(this.I)) throw MError('Target name and plugin names should not contain "." or ":"'), "abort";
                 if (this.f && "t0" != this.c) throw MError("Provide command should not be preceeded by a tracker name."), "abort";
             }
@@ -1609,7 +1609,7 @@
     var x = function(a, b, c) {
             var d = b == Z ? Fc : b.get(T),
                 e = Re.get(a);
-            if (!t(e)) return MInfo("Waiting on require of %s to be fulfilled.", a), !1;
+            if (!isFunction(e)) return MInfo("Waiting on require of %s to be fulfilled.", a), !1;
             b.plugins_ = b.plugins_ || new ef;
             if (b.plugins_.get(a)) return MError("Command ignored. Plugin %s has already been required on tracker %s.", a, d), !0;
             b.plugins_.set(a, new e(b, c || {}));
@@ -1617,7 +1617,7 @@
             return !0
         },
         z = function(a, b, c, d, e) {
-            if (!t(Re.get(b)) && !Te.get(b)) {
+            if (!isFunction(Re.get(b)) && !Te.get(b)) {
                 Se.hasOwnProperty(b) && F(Se[b]);
                 if (p.test(b)) {
                     F(52);
@@ -1661,11 +1661,11 @@
         },
         C = function(a) {
             var b = Ue(I.location.href);
-            if (H(a.url, "https://www.google-analytics.com/gtm/js?id=")) return !0;
+            if (startsWith(a.url, "https://www.google-analytics.com/gtm/js?id=")) return !0;
             if (a.query || 0 <= a.url.indexOf("?") || 0 <= a.path.indexOf("://")) return !1;
             if (a.host == b.host && a.port == b.port) return !0;
             b = "http:" == a.protocol ? 80 : 443;
-            return "www.google-analytics.com" == a.host && (a.port || b) == b && H(a.path, "/plugins/") ? !0 : !1
+            return "www.google-analytics.com" == a.host && (a.port || b) == b && startsWith(a.path, "/plugins/") ? !0 : !1
         },
         Ue = function(a) {
             function b(a) {
@@ -1673,7 +1673,7 @@
                     c = (a.protocol || "").toLowerCase(),
                     c = 1 * a.port || ("http:" == c ? 80 : "https:" == c ? 443 : "");
                 a = a.pathname || "";
-                H(a, "/") || (a = "/" + a);
+                startsWith(a, "/") || (a = "/" + a);
                 return [b, "" + c, a]
             }
             var c = I.createElement("a");
@@ -1682,7 +1682,7 @@
                 e = b(c),
                 f = c.search || "",
                 ea = d + "//" + e[0] + (e[1] ? ":" + e[1] : "");
-            H(a, "//") ? a = d + a : H(a, "/") ? a = ea + a : !a || H(a, "?") ? a = ea + e[2] + (a || f) : 0 > a.split("/")[0].indexOf(":") && (a = ea + e[2].substring(0, e[2].lastIndexOf("/")) + "/" + a);
+            startsWith(a, "//") ? a = d + a : startsWith(a, "/") ? a = ea + a : !a || startsWith(a, "?") ? a = ea + e[2] + (a || f) : 0 > a.split("/")[0].indexOf(":") && (a = ea + e[2].substring(0, e[2].lastIndexOf("/")) + "/" + a);
             c.href = a;
             d = b(c);
             return {
@@ -1728,7 +1728,7 @@
             var e = arguments[c],
                 f = d,
                 ea = l;
-            ga(e) || t(e) ? ga(e) && !G(e[0]) ? MError("First element of command array is not a string: %s", e) : f && f.g ? MError("Invalid require command: %s", e) : MError("Command failure: %s", ea) : MError("Command is not an array or function: %s", ea)
+            isArray(e) || isFunction(e) ? isArray(e) && !isString(e[0]) ? MError("First element of command array is not a string: %s", e) : f && f.g ? MError("Invalid require command: %s", e) : MError("Command failure: %s", ea) : MError("Command is not an array or function: %s", ea)
         }
         return b
     };
@@ -1844,7 +1844,7 @@
             D("displayfeatures", $d);
             D("adfeatures", $d);
             a = a && a.q;
-            ga(a) ? jf.H.apply(Z, a) : F(50)
+            isArray(a) ? jf.H.apply(Z, a) : F(50)
         }
         MGroupEnd()
     };
