@@ -570,12 +570,12 @@
         } catch (d) {}
         return !1
     };
-    var Md = function(a) {
+    var Md = function(key) {
             var b = [],
                 c = I.cookie.split(";");
-            a = new RegExp("^\\s*" + a + "=\\s*(.*?)\\s*$");
+            var REG = new RegExp("^\\s*" + key + "=\\s*(.*?)\\s*$");
             for (var d = 0; d < c.length; d++) {
-                var e = c[d].match(a);
+                var e = c[d].match(REG);
                 e && b.push(e[1])
             }
             return b
