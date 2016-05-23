@@ -78,7 +78,7 @@
         },
         g = /^[\w\-:/.?=&%!]+$/,
         Ea = function(a, b, c) {
-            a && (N("Loading script: %s", a), c ? (c = "", b && (g.test(b) ? c = ' id="' + b + '"' : J("Dropping invalid script ID: %s", b)), g.test(a) ? I.write("<script" + c + ' src="' + a + '">\x3c/script>') : J("URL uses invalid characters. Dropping request for: %s",
+            a && (MInfo("Loading script: %s", a), c ? (c = "", b && (g.test(b) ? c = ' id="' + b + '"' : MWarn("Dropping invalid script ID: %s", b)), g.test(a) ? I.write("<script" + c + ' src="' + a + '">\x3c/script>') : MWarn("URL uses invalid characters. Dropping request for: %s",
                 a)) : (c = I.createElement("script"), c.type = "text/javascript", c.async = !0, c.src = a, b && (c.id = b), a = I.getElementsByTagName("script")[0], a.parentNode.insertBefore(c, a)))
         },
         df = function() {
@@ -105,7 +105,7 @@
                 if ("object" === typeof b[e]) {
                     for (var f in b[e]) b[e].hasOwnProperty(f) && (c[f] = b[e][f]);
                     break
-                } else e < a.length ? c[a[e]] = b[e] : J("Unrecognized positional argument: " + b[e]);
+                } else e < a.length ? c[a[e]] = b[e] : MWarn("Unrecognized positional argument: " + b[e]);
             return c
         },
         Zb = function(a, b) {
@@ -120,7 +120,7 @@
         this.debug = !1
     };
     ef.prototype.set = function(a, b, c) {
-        this.debug && L("  " + a + "=" + Fa(b) + (c ? " (temp)" : ""));
+        this.debug && MTrace("  " + a + "=" + Fa(b) + (c ? " (temp)" : ""));
         this.keys.push(a);
         c ? this.u[":" + a] = b : this.values[":" + a] = b
     };
@@ -280,60 +280,62 @@
             return ""
         };
 
-    function Ga(a, b) {
-        var c = [].slice.call(arguments);
-        c.unshift("log");
-        M.log.apply(M, c)
+    function MLog(...args) {
+        args.unshift("log");
+        M.log.apply(M, args);
     }
 
-    function N(a, b) {
-        var c = [].slice.call(arguments);
-        c.unshift("info");
-        M.log.apply(M, c)
+    function MInfo(...args) {
+        args.unshift("info");
+        M.log.apply(M, args)
     }
 
-    function J(a, b) {
-        var c = [].slice.call(arguments);
-        c.unshift("warn");
-        M.log.apply(M, c)
+    function MWarn(...args) {
+        args.unshift("warn");
+        M.log.apply(M, args)
     }
 
-    function O(a, b) {
-        var c = [].slice.call(arguments);
-        c.unshift("error");
-        M.log.apply(M, c)
+    function MError(...args) {
+        args.unshift("error");
+        M.log.apply(M, args)
     }
 
-    function L(a, b) {
-        var c = Q.ga_debug;
-        c && c.trace && (c = [].slice.call(arguments), c.unshift("log"), M.log.apply(M, c))
+    function MTrace(...args) {
+        if (window.ga_debug && window.ga_debug.trace) {
+            args.unshift("log");
+            M.log.apply(M, args);
+        }
     }
 
-    function dd(a, b) {
-        var c = [].slice.call(arguments);
-        c.unshift("group");
-        M.log.apply(M, c)
+    function MGroup(...args) {
+        args.unshift("group");
+        M.log.apply(M, args)
     }
 
-    function ge() {
+    function MGroupEnd() {
         M.log.apply(M, ["groupEnd"])
     }
     var M = new function() {
-        var a = window.console,
-            b = a && "Firebug Lite" == a.provider;
-        this.log = function(c, d, e) {
-            if (a) {
-                var f = Ha.apply(window, [].slice.call(arguments, 1));
-                if (b)
-                    for (var f = f.split("\n"), ea = 0; ea < f.length; ea++) a[c](f[ea]);
-                else if (a[c]) a[c](f);
-                else "group" == c && a.log(f)
+        var console = window.console;
+        var b = console && "Firebug Lite" == console.provider;
+        this.log = function(level, ...args) {
+            if (console) {
+                var f = Ha.apply(window, args);
+                if (b) {
+                    for (var f = f.split("\n"), ea = 0; ea < f.length; ea++) {
+                        console[level](f[ea]);
+                    }
+                } else if (console[level]) {
+                    console[level](f);
+                } else if ("group" == c) {
+                    console.log(f);
+                }
             }
         }
     };
 
     function Ia(a) {
-        N("\nSent beacon:\n" + a + "\n\n");
+        MInfo("\nSent beacon:\n" + a + "\n\n");
         var b = [];
         a = a.split("&");
         for (var c = 0; c < a.length; c++) {
@@ -358,7 +360,7 @@
                 var f = he(0) + a[c][d];
                 e.push(f + he((b[d] || 0) - f.length))
             }
-            N(e.join(" "))
+            MInfo(e.join(" "))
         }
     }
 
@@ -368,11 +370,11 @@
             var ea = a.get(c);
             void 0 != ea && "_" != c[0] && b.push(c + (d.i ? " (" + d.i + ")" : "") + " = " + Fa(ea))
         });
-        for (var c = b.sort(), d = 0; d < c.length; d++) N("  " + c[d])
+        for (var c = b.sort(), d = 0; d < c.length; d++) MInfo("  " + c[d])
     }
 
     function Td(a) {
-        for (var b in a) a.hasOwnProperty(b) && (Zb(ac, b) || (yc(b) ? J('This field cannot be set in a create method. Please use ga("set", %s, %s);', b, a[b]) : J("Create config had an unknown parameter: %s", b)), La(b, a[b]))
+        for (var b in a) a.hasOwnProperty(b) && (Zb(ac, b) || (yc(b) ? MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', b, a[b]) : MWarn("Create config had an unknown parameter: %s", b)), La(b, a[b]))
     }
 
     function Fa(a, b) {
@@ -409,7 +411,7 @@
             case U:
             case Ma:
             case Gc:
-                J("Expected a value for required field: %s", a)
+                MWarn("Expected a value for required field: %s", a)
         } else {
             switch (a) {
                 case Ma:
@@ -453,7 +455,7 @@
                 case wb:
                 case xb:
                 case Pd:
-                    G(b) || J("Expected a string value for field: %s. but found: %s.", a, typeof b);
+                    G(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
                     break;
                 case yb:
                 case zb:
@@ -462,7 +464,7 @@
                 case Cb:
                 case Db:
                 case Eb:
-                    !isNaN(parseFloat(b)) && isFinite(b) || J("Expected a number value for the field: %s. but found: %s.", a, typeof b);
+                    !isNaN(parseFloat(b)) && isFinite(b) || MWarn("Expected a number value for the field: %s. but found: %s.", a, typeof b);
                     break;
                 case Fb:
                 case Gb:
@@ -473,7 +475,7 @@
                 case Kb:
                 case Lb:
                 case Mb:
-                    !0 !== b && !1 !== b && 1 !== b && 0 !== b && J("Expected a boolean value for the field: %s. but found: %s.", a, typeof b);
+                    !0 !== b && !1 !== b && 1 !== b && 0 !== b && MWarn("Expected a boolean value for the field: %s. but found: %s.", a, typeof b);
                     break;
                 case Nb:
                 case Ob:
@@ -483,21 +485,21 @@
                 case Tb:
                 case Ub:
                 case Vb:
-                    t(b) || J("Expected a function for the field value: %s. but found: %s.", a, typeof b);
+                    t(b) || MWarn("Expected a function for the field value: %s. but found: %s.", a, typeof b);
                     break;
                 case T:
-                    /^[a-zA-Z0-9_]+$/.test(b) || O("Tracker name should only consist of alphanumeric characters.");
+                    /^[a-zA-Z0-9_]+$/.test(b) || MError("Tracker name should only consist of alphanumeric characters.");
                     break;
                 case U:
-                    va.test(b) || J("The tracking Id should only be of the format UA-NNNNNN-N.")
-            }!/^contentGroup[0-9]+$/.test(a) && !/^dimension[0-9]+$/.test(a) || G(b) || J("Expected a string value for field: %s. but found: %s.", a, typeof b);
-            !/^metric[0-9]+$/.test(a) || !isNaN(parseFloat(b)) && isFinite(b) || J("Expected a number value for field: %s. but found: %s.", a, typeof b)
+                    va.test(b) || MWarn("The tracking Id should only be of the format UA-NNNNNN-N.")
+            }!/^contentGroup[0-9]+$/.test(a) && !/^dimension[0-9]+$/.test(a) || G(b) || MWarn("Expected a string value for field: %s. but found: %s.", a, typeof b);
+            !/^metric[0-9]+$/.test(a) || !isNaN(parseFloat(b)) && isFinite(b) || MWarn("Expected a number value for field: %s. but found: %s.", a, typeof b)
         }
     }
 
     function Ec(a) {
         function b(b) {
-            G(a.get(b)) || O("Missing required field '%s' for hit of type '%s'", b, c)
+            G(a.get(b)) || MError("Missing required field '%s' for hit of type '%s'", b, c)
         }
         var c = V(a, Ma);
         switch (c) {
@@ -527,7 +529,7 @@
     }
 
     function od(a, b) {
-        N("\nSent beacon:\n" + b + "\n\n");
+        MInfo("\nSent beacon:\n" + b + "\n\n");
         var c = [];
         a.map(function(a, b) {
             if ("_" != a.charAt(0)) {
@@ -575,7 +577,7 @@
             return b
         },
         pe = function(a, b, c, d, e, f) {
-            ld(e) ? (N("Aborting cookie write: User has opted out of tracking."), e = !1) : Wd.test(I.location.hostname) || "/" == c && fe.test(d) ? (N("Aborting cookie write: Prohibited domain."), e = !1) : e = !0;
+            ld(e) ? (MInfo("Aborting cookie write: User has opted out of tracking."), e = !1) : Wd.test(I.location.hostname) || "/" == c && fe.test(d) ? (MInfo("Aborting cookie write: Prohibited domain."), e = !1) : e = !0;
             if (!e) return !1;
             b && 1200 < b.length && (b = b.substring(0, 1200), F(24));
             c = a + "=" + b + "; path=" + c + "; ";
@@ -602,7 +604,7 @@
             c = c || Aa;
             if (2036 >= b.length) id(a, b, c), Ia(b);
             else if (8192 >= b.length) u(a, b, c) || te(a, b, c) || id(a, b, c), Ia(b);
-            else throw O("Payload size is too large (%s).  Max allowed is %s.", b.length, 8192), fc("len", b.length), new bc(b.length);
+            else throw MError("Payload size is too large (%s).  Max allowed is %s.", b.length, 8192), fc("len", b.length), new bc(b.length);
         },
         id = function(a, b, c) {
             var d = za(a + "?" + b);
@@ -631,7 +633,7 @@
             return Q.navigator.sendBeacon ? Q.navigator.sendBeacon(a, b) ? (c(), !0) : !1 : !1
         },
         fc = function(a, b, c) {
-            O("Error: type=%s method=%s message=%s account=%s", arguments);
+            MError("Error: type=%s method=%s message=%s account=%s", arguments);
             if (!(1 <= 100 * Math.random() || ld("?"))) {
                 var d = ["t=error", "_e=" + a, "_v=j43d", "sr=1"];
                 b && d.push("_f=" + b);
@@ -652,31 +654,31 @@
         this.m.push(a)
     };
     gc.prototype.H = function(a) {
-        L("\nExecuting " + this.m.length + " filters:");
+        MTrace("\nExecuting " + this.m.length + " filters:");
         try {
             for (var b = 0; b < this.m.length; b++) {
-                L("  filter[" + b + "]: " + this.m[b]);
+                MTrace("  filter[" + b + "]: " + this.m[b]);
                 var c = a.get(this.m[b]);
-                c && t(c) ? c.call(Q, a) : L("  Skipping (no function found.)")
+                c && t(c) ? c.call(Q, a) : MTrace("  Skipping (no function found.)")
             }
         } catch (d) {
-            L("Aborted execution due to exception: " + d)
+            MTrace("Aborted execution due to exception: " + d)
         }
         b = a.get(Nb);
-        b != Aa && t(b) && (L("Manually firing callback"), a.set(Nb, Aa, !0), setTimeout(b, 10))
+        b != Aa && t(b) && (MTrace("Manually firing callback"), a.set(Nb, Aa, !0), setTimeout(b, 10))
     };
 
     function hc(a) {
-        if (100 != a.get(Db) && ic(V(a, R)) % 1E4 >= 100 * jc(a, Db)) throw N("User has been sampled out. Aborting hit."), "abort";
+        if (100 != a.get(Db) && ic(V(a, R)) % 1E4 >= 100 * jc(a, Db)) throw MInfo("User has been sampled out. Aborting hit."), "abort";
     }
 
     function kc(a) {
-        if (ld(V(a, U))) throw N("User has opted out of tracking. Aborting hit."), "abort";
+        if (ld(V(a, U))) throw MInfo("User has opted out of tracking. Aborting hit."), "abort";
     }
 
     function lc() {
         var a = I.location.protocol;
-        if ("http:" != a && "https:" != a) throw N("Unallowed document protocol. Aborting hit."), "abort";
+        if ("http:" != a && "https:" != a) throw MInfo("Unallowed document protocol. Aborting hit."), "abort";
     }
 
     function mc(a) {
@@ -703,10 +705,10 @@
         if (c) {
             var d = V(a, Na),
                 e = a.get(Nb);
-            8192 < d.length && O("Payload size is too large (%s).  Max allowed is %s.", d.length, 8192);
+            8192 < d.length && MError("Payload size is too large (%s).  Max allowed is %s.", d.length, 8192);
             e = e || Aa;
-            N("Sending hit with transport method %s", c);
-            "image" == c ? (id(b, d, e), Ia(d)) : "xhr" == c && te(b, d, e) ? Ia(d) : "beacon" == c && u(b, d, e) ? Ia(d) : (N("Transport Method, %s, is not supported, falling back to default method.", c), da(b, d, e))
+            MInfo("Sending hit with transport method %s", c);
+            "image" == c ? (id(b, d, e), Ia(d)) : "xhr" == c && te(b, d, e) ? Ia(d) : "beacon" == c && u(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), da(b, d, e))
         } else da(b, V(a, Na), a.get(Nb));
         b = a.get(U);
         b = h(b);
@@ -735,7 +737,7 @@
     }
 
     function Ud() {
-        if (Q.navigator && "preview" == Q.navigator.loadPurpose) throw N("Navigator in preview mode. Aborting hit."), "abort";
+        if (Q.navigator && "preview" == Q.navigator.loadPurpose) throw MInfo("Navigator in preview mode. Aborting hit."), "abort";
     }
 
     function ve(a) {
@@ -744,7 +746,7 @@
     }
 
     function ya(a) {
-        if (!a.get(U)) throw O("Tracking ID not set. Aborting hit."), "abort";
+        if (!a.get(U)) throw MError("Tracking ID not set. Aborting hit."), "abort";
     };
     var ae = function() {
             return Math.round(2147483647 * Math.random())
@@ -761,7 +763,7 @@
 
     function qc(a) {
         var b = jc(a, rc);
-        500 <= b && (F(15), N("Exceeded maximum number of hits for this page. Try reducing the number of hits being sent."));
+        500 <= b && (F(15), MInfo("Exceeded maximum number of hits for this page. Try reducing the number of hits being sent."));
         var c = V(a, Ma);
         if ("transaction" != c && "item" != c) {
             var c = jc(a, uc),
@@ -770,7 +772,7 @@
             0 == e && a.set(vc, d);
             e = Math.round(2 * (d - e) / 1E3);
             0 < e && (c = Math.min(c + e, 20), a.set(vc, d));
-            if (0 >= c) throw N("Exceeded rate limit for sending hits. Aborting hit."), "abort";
+            if (0 >= c) throw MInfo("Exceeded rate limit for sending hits. Aborting hit."), "abort";
             a.set(uc, --c)
         }
         a.set(rc, ++b)
@@ -805,7 +807,7 @@
             La(b, c);
             var e = yc(b);
             e && e.w ? e.w(a, b, c, d) : a.data.set(b, c, d);
-            e || N("Set called on unknown field: %s.", b)
+            e || MInfo("Set called on unknown field: %s.", b)
         },
         Ac = function(a, b, c, d, e) {
             this.name = a;
@@ -821,7 +823,7 @@
                     var d = xc[c],
                         e = d[0].exec(a);
                     if (e) {
-                        L("Generating new model field for name: " + a);
+                        MTrace("Generating new model field for name: " + a);
                         b = d[1](e);
                         Ka.set(b.name, b);
                         break
@@ -848,7 +850,7 @@
             return W(a, b, c, void 0, Cc)
         },
         Cc = function(a, b) {
-            O("Ignored attempt to update read-only property: " + b)
+            MError("Ignored attempt to update read-only property: " + b)
         };
     var Fc = G(window.GoogleAnalyticsObject) && xa(window.GoogleAnalyticsObject) || "ga",
         $b = !1,
@@ -945,7 +947,7 @@
     Bc("\\&(.*)", function(a) {
         var b = new Ac(a[0], a[1]),
             c = kd(a[0].substring(1));
-        c && (L("Alias created: " + a[0] + " -> " + c), b.v = function(a) {
+        c && (MTrace("Alias created: " + a[0] + " -> " + c), b.v = function(a) {
             return a.get(c)
         }, b.w = function(a, b, f, ea) {
             a.set(c, f, ea)
@@ -1033,13 +1035,13 @@
     };
     var Sc = function(a, b) {
             var c = Math.min(jc(a, Eb), 100);
-            if (ic(V(a, R)) % 100 >= c) L("Site speed data not sent - visitor sampled out");
+            if (ic(V(a, R)) % 100 >= c) MTrace("Site speed data not sent - visitor sampled out");
             else if (c = {}, qd(c) || rd(c)) {
                 var d = c[Ic];
-                void 0 == d || Infinity == d || isNaN(d) ? L("Site speed data not sent - unsupported browser") : 0 < d ? (Rc(c, Kc), Rc(c, Nc), Rc(c, Mc), Rc(c, Jc), Rc(c, Lc), Rc(c, Oc), Rc(c, Pc), b(c)) : (L("Site speed data not available - waiting for onload"), Ca(Q, "load", function() {
+                void 0 == d || Infinity == d || isNaN(d) ? MTrace("Site speed data not sent - unsupported browser") : 0 < d ? (Rc(c, Kc), Rc(c, Nc), Rc(c, Mc), Rc(c, Jc), Rc(c, Lc), Rc(c, Oc), Rc(c, Pc), b(c)) : (MTrace("Site speed data not available - waiting for onload"), Ca(Q, "load", function() {
                     Sc(a, b)
                 }, !1))
-            } else L("Site speed data not sent - unsupported browser")
+            } else MTrace("Site speed data not sent - unsupported browser")
         },
         qd = function(a) {
             var b = Q.performance ||
@@ -1094,17 +1096,17 @@
                     F(32);
                     for (var l = fd(), k = 0; k < l.length; k++)
                         if (e = l[k], a.data.set(S, e), c = ie(a), pe(b, c, d, e, ea, f)) {
-                            N("Auto cookieDomain found: %s", e);
+                            MInfo("Auto cookieDomain found: %s", e);
                             Tc = !0;
                             return
                         }
-                    O("Cookie write failed.");
+                    MError("Cookie write failed.");
                     a.data.set(S, "auto")
                 }
             }
         },
         Zc = function(a) {
-            if ("cookie" == V(a, xb) && !Tc && (Yc(a), !Tc)) throw N("Storage not available. Aborting hit."), "abort";
+            if ("cookie" == V(a, xb) && !Tc && (Yc(a), !Tc)) throw MInfo("Storage not available. Aborting hit."), "abort";
         },
         Kd = function(a) {
             if (a.get(Id)) {
@@ -1203,7 +1205,7 @@
             if ("form" == a.tagName.toLowerCase()) return me(this, a)
         }
         if ("string" == typeof a) return le(this, a, b);
-        O("Unknown Object passed to linker:decorate %s", a)
+        MError("Unknown Object passed to linker:decorate %s", a)
     };
     var le = function(a, b, c) {
             var d = ke.exec(b);
@@ -1217,7 +1219,7 @@
         me = function(a, b) {
             if (b)
                 if (b.action) {
-                    N("Linker decorating form: %s", b);
+                    MInfo("Linker decorating form: %s", b);
                     var c = a.target.get("linkerParam").split("=")[1];
                     if ("get" == b.method.toLowerCase()) {
                         for (var d = b.childNodes || [], e = 0; e < d.length; e++)
@@ -1230,8 +1232,8 @@
                         d.setAttribute("name", "_ga");
                         d.setAttribute("value", c);
                         b.appendChild(d)
-                    } else "post" == b.method.toLowerCase() ? b.action = le(a, b.action) : O("Unknown form method %s on %s", b.method, b)
-                } else O("An action is required for the linker to work.")
+                    } else "post" == b.method.toLowerCase() ? b.action = le(a, b.action) : MError("Unknown form method %s on %s", b.method, b)
+                } else MError("An action is required for the linker to work.")
         };
     pd.prototype.U = function(a, b, c) {
         function d(c) {
@@ -1250,7 +1252,7 @@
                     }
                     d = {}
                 }
-                "http:" != d.protocol && "https:" != d.protocol || !ne(a, d.hostname || "") || (d.href && (d.href = le(e, d.href, b)), N("Link decorated: " + d.href))
+                "http:" != d.protocol && "https:" != d.protocol || !ne(a, d.hostname || "") || (d.href && (d.href = le(e, d.href, b)), MInfo("Link decorated: " + d.href))
             } catch (v) {
                 F(26)
             }
@@ -1317,10 +1319,10 @@
             })
         },
         Je = function(a, b) {
-            b.get(a.Y) ? J("Join id already set") : "1" == Md(a.aa)[0] ? b.set(a.Y, "", !0) : b.set(a.Y, "" + ae(), !0)
+            b.get(a.Y) ? MWarn("Join id already set") : "1" == Md(a.aa)[0] ? b.set(a.Y, "", !0) : b.set(a.Y, "" + ae(), !0)
         },
         Ke = function(a, b) {
-            b.get(a.Y) && (N("Setting throttling cookie: %s", a.aa), pe(a.aa, "1", b.get(vb), b.get(S), b.get(U), 6E5))
+            b.get(a.Y) && (MInfo("Setting throttling cookie: %s", a.aa), pe(a.aa, "1", b.get(vb), b.get(S), b.get(U), 6E5))
         },
         Ee = function(a, b) {
             if (b.get(a.Y)) {
@@ -1395,7 +1397,7 @@
             var d = this;
             this.a = new wc;
             this.filters = new gc;
-            L("Initializing tracker");
+            MTrace("Initializing tracker");
             b(T, a[T]);
             b(U, xa(a[U]));
             b(ub, a[ub]);
@@ -1434,7 +1436,7 @@
             this.a.set(yb, He());
             Od(this.a.get(U), this.a.get(S), this.a.get(vb));
             Td(a);
-            L("Initialization complete\n\n")
+            MTrace("Initialization complete\n\n")
         },
         vd = function(a, b) {
             if ("cookie" == V(a, xb)) {
@@ -1451,8 +1453,7 @@
                             ("GA1" == ea || "1" == ea) && 1 < f.length ? (ea = f.shift().split("-"), 1 == ea.length && (ea[1] = "1"), ea[0] *= 1, ea[1] *= 1, f = {
                                 K: ea,
                                 M: f.join(".")
-                            }) : (J("Unknown cookie version: " +
-                                ea), f = void 0);
+                            }) : (MWarn("Unknown cookie version: " + ea), f = void 0);
                             f && c.push(f)
                         }
                         if (1 == c.length) {
@@ -1477,18 +1478,18 @@
                     }
                     c = void 0
                 }
-                c || (c = V(a, S), d = V(a, wb) || Wb(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], Ga("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
+                c || (c = V(a, S), d = V(a, wb) || Wb(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], MLog("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
                 c && (a.data.set(R, c), Tc = !0)
             }
             c = a.get(Lb);
             if (c = (c = I.location[c ? "href" : "search"].match("(?:&|#|\\?)" +
-                    P("_ga").replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") + "=([^&#]*)")) && 2 == c.length ? c[1] : "") a.get(Kb) ? (e = c.indexOf("."), -1 == e ? (J("Invalid linker parameter format: " + c), F(22)) : (f = c.substring(e + 1), "1" != c.substring(0, e) ? (J("Unrecognized linker parameter version: " + c), F(22)) : (e = f.indexOf("."), -1 == e ? (J("Invalid linker parameter v1 payload: " + c), F(22)) : (d = f.substring(0, e), e = f.substring(e + 1), d != ud(e, 0) && d != ud(e, -1) && d != ud(e, -2) ? (J("Bad or expired linker parameter hash: " + c), F(23)) : (Ga("Loaded linker parameter: " +
-                c), F(11), a.data.set(R, e)))))) : (J("Linker disabled. Ignoring linker parameter: " + c), F(21));
-            b && (Ga("Used client Id from constructor."), F(9), a.data.set(R, P(b)));
+                    P("_ga").replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") + "=([^&#]*)")) && 2 == c.length ? c[1] : "") a.get(Kb) ? (e = c.indexOf("."), -1 == e ? (MWarn("Invalid linker parameter format: " + c), F(22)) : (f = c.substring(e + 1), "1" != c.substring(0, e) ? (MWarn("Unrecognized linker parameter version: " + c), F(22)) : (e = f.indexOf("."), -1 == e ? (MWarn("Invalid linker parameter v1 payload: " + c), F(22)) : (d = f.substring(0, e), e = f.substring(e + 1), d != ud(e, 0) && d != ud(e, -1) && d != ud(e, -2) ? (MWarn("Bad or expired linker parameter hash: " + c), F(23)) : (MLog("Loaded linker parameter: " +
+                c), F(11), a.data.set(R, e)))))) : (MWarn("Linker disabled. Ignoring linker parameter: " + c), F(21));
+            b && (MLog("Used client Id from constructor."), F(9), a.data.set(R, P(b)));
             if (!a.get(R))
-                if (c = (c = Q.gaGlobal && Q.gaGlobal.vid) && -1 != c.search(/^(?:utma\.)?\d+\.\d+$/) ? c : void 0) Ga("New visitor. Copying new clientId"), F(17), a.data.set(R, c);
+                if (c = (c = Q.gaGlobal && Q.gaGlobal.vid) && -1 != c.search(/^(?:utma\.)?\d+\.\d+$/) ? c : void 0) MLog("New visitor. Copying new clientId"), F(17), a.data.set(R, c);
                 else {
-                    Ga("New visitor. Generating new clientId");
+                    MLog("New visitor. Generating new clientId");
                     F(8);
                     c = Q.navigator.userAgent + (I.cookie ? I.cookie : "") + (I.referrer ? I.referrer : "");
                     d = c.length;
@@ -1529,7 +1530,7 @@
             }
         };
     ad.prototype.get = function(a) {
-        G(a) || O("Please specify a field name to get it's value.");
+        G(a) || MError("Please specify a field name to get it's value.");
         return this.a.get(a)
     };
     ad.prototype.set = function(a, b) {
@@ -1542,12 +1543,12 @@
         timing: [lb, mb, Bb, nb]
     };
     ad.prototype.send = function(a) {
-        L("Send start: " + (0 == Z.h ? -1 : (new Date).getTime() - Z.h));
-        if (1 > arguments.length) O("No hit type specified. Aborting hit.");
+        MTrace("Send start: " + (0 == Z.h ? -1 : (new Date).getTime() - Z.h));
+        if (1 > arguments.length) MError("No hit type specified. Aborting hit.");
         else {
             var b, c;
             "string" === typeof arguments[0] ? (b = arguments[0], c = [].slice.call(arguments, 1)) : (b = arguments[0] && arguments[0][Ma], c = arguments);
-            b ? (c = Yb(bd[b] || [], c), c[Ma] = b, this.a.set(c, void 0, !0), this.filters.H(this.a), L("Send finished: " + (0 == Z.h ? -1 : (new Date).getTime() - Z.h)), this.a.data.u = {}) : O("No hit type specified. Aborting hit.")
+            b ? (c = Yb(bd[b] || [], c), c[Ma] = b, this.a.set(c, void 0, !0), this.filters.H(this.a), MTrace("Send finished: " + (0 == Z.h ? -1 : (new Date).getTime() - Z.h)), this.a.data.u = {}) : MError("No hit type specified. Aborting hit.")
         }
     };
     ad.prototype.pa = function(a, b) {
@@ -1585,11 +1586,11 @@
                 null != b && 4 == b.length && (this.c = b[1] || "t0", this.I = b[2] || "", this.A = b[3], this.b = [].slice.call(a, 1), this.I || (this.D = "create" == this.A, this.g = "require" == this.A, this.f = "provide" == this.A, this.$ = "remove" == this.A), this.g && (3 <= this.b.length ? (this.da = this.b[1], this.ba = this.b[2]) : this.b[1] && (G(this.b[1]) ? this.da = this.b[1] : this.ba = this.b[1])));
                 var b = a[1],
                     c = a[2];
-                if (!this.A) throw O("Invalid command: " + a), "abort";
-                if (this.g && (!G(b) || "" == b)) throw O("Invalid require command.", a), "abort";
-                if (this.f && (!G(b) || "" == b || !t(c))) throw O("Invalid provide command.", a), "abort";
-                if (re(this.c) || re(this.I)) throw O('Target name and plugin names should not contain "." or ":"'), "abort";
-                if (this.f && "t0" != this.c) throw O("Provide command should not be preceeded by a tracker name."), "abort";
+                if (!this.A) throw MError("Invalid command: " + a), "abort";
+                if (this.g && (!G(b) || "" == b)) throw MError("Invalid require command.", a), "abort";
+                if (this.f && (!G(b) || "" == b || !t(c))) throw MError("Invalid provide command.", a), "abort";
+                if (re(this.c) || re(this.I)) throw MError('Target name and plugin names should not contain "." or ":"'), "abort";
+                if (this.f && "t0" != this.c) throw MError("Provide command should not be preceeded by a tracker name."), "abort";
             }
         };
 
@@ -1608,11 +1609,11 @@
     var x = function(a, b, c) {
             var d = b == Z ? Fc : b.get(T),
                 e = Re.get(a);
-            if (!t(e)) return N("Waiting on require of %s to be fulfilled.", a), !1;
+            if (!t(e)) return MInfo("Waiting on require of %s to be fulfilled.", a), !1;
             b.plugins_ = b.plugins_ || new ef;
-            if (b.plugins_.get(a)) return O("Command ignored. Plugin %s has already been required on tracker %s.", a, d), !0;
+            if (b.plugins_.get(a)) return MError("Command ignored. Plugin %s has already been required on tracker %s.", a, d), !0;
             b.plugins_.set(a, new e(b, c || {}));
-            N("Plugin %s intialized on tracker %s.", a, d);
+            MInfo("Plugin %s intialized on tracker %s.", a, d);
             return !0
         },
         z = function(a, b, c, d, e) {
@@ -1630,7 +1631,7 @@
                         qa: e,
                         J: !1
                     };
-                    a.get("&gtm") == b && (d.J = !0, O("Infinite loop detected. Tracker trying to load the container (%s) that created it. Ignoring require statement.", b));
+                    a.get("&gtm") == b && (d.J = !0, MError("Infinite loop detected. Tracker trying to load the container (%s) that created it. Ignoring require statement.", b));
                     var f = String(a.get("name"));
                     "t0" != f && (d.target = f);
                     ld(String(a.get("trackingId"))) || (d.ma = String(a.get(R)), d.na = Number(a.get(n)), a = c.palindrome ? r : q, a = (a = I.cookie.replace(/^|(; +)/g, ";").match(a)) ? a.sort().join("").substring(1) : void 0, d.oa = a);
@@ -1645,7 +1646,7 @@
                     Q[a].push(c);
                     c = w(d)
                 }!c && Se.hasOwnProperty(b) ? (F(39), c = b + ".js") : F(43);
-                c ? (c && 0 <= c.indexOf("/") || (c = ($b || df() ? "https:" : "http:") + "//www.google-analytics.com/plugins/ua/" + c), d = Ue(c), a = d.protocol, c = I.location.protocol, ("https:" == a || a == c || ("http:" != a ? 0 : "http:" == c)) && C(d) ? (N("Loading resource for plugin: " + b), Ea(d.url, void 0, e), Te.set(b, !0)) : O("Error loading resource for plugin %s: Refusing to load url: %s", b, d.url)) : N("No plugin url set for %s.", b)
+                c ? (c && 0 <= c.indexOf("/") || (c = ($b || df() ? "https:" : "http:") + "//www.google-analytics.com/plugins/ua/" + c), d = Ue(c), a = d.protocol, c = I.location.protocol, ("https:" == a || a == c || ("http:" != a ? 0 : "http:" == c)) && C(d) ? (MInfo("Loading resource for plugin: " + b), Ea(d.url, void 0, e), Te.set(b, !0)) : MError("Error loading resource for plugin %s: Refusing to load url: %s", b, d.url)) : MInfo("No plugin url set for %s.", b)
             }
         },
         y = function(a, b) {
@@ -1710,9 +1711,9 @@
                 for (var d = [], e = 0; c.G && e < c.G.length; e++) d.push(Fa(c.G[e]));
                 c = "ga(" + d.join(", ") + ")"
             }
-            dd("Running command: " + c);
+            MGroup("Running command: " + c);
             c = jf.R(b[0]);
-            ge();
+            MGroupEnd();
             if (c) break;
             b.shift();
             if (0 < jf.j.length) break
@@ -1722,12 +1723,12 @@
     jf.N = function(a) {
         for (var b = [], c = 0; c < arguments.length; c++) try {
             var d = new se(arguments[c]);
-            d.f ? (D(d.b[0], d.b[1]), N("Registered new plugin: ga(provide, %s, Function)", d.b[0])) : (d.g && (d.ha = z(d.c, d.b[0], d.da, d.ba)), b.push(d))
+            d.f ? (D(d.b[0], d.b[1]), MInfo("Registered new plugin: ga(provide, %s, Function)", d.b[0])) : (d.g && (d.ha = z(d.c, d.b[0], d.da, d.ba)), b.push(d))
         } catch (l) {
             var e = arguments[c],
                 f = d,
                 ea = l;
-            ga(e) || t(e) ? ga(e) && !G(e[0]) ? O("First element of command array is not a string: %s", e) : f && f.g ? O("Invalid require command: %s", e) : O("Command failure: %s", ea) : O("Command is not an array or function: %s", ea)
+            ga(e) || t(e) ? ga(e) && !G(e[0]) ? MError("First element of command array is not a string: %s", e) : f && f.g ? MError("Invalid require command: %s", e) : MError("Command failure: %s", ea) : MError("Command is not an array or function: %s", ea)
         }
         return b
     };
@@ -1736,7 +1737,7 @@
             if (a.s) a.s.call(Q, Z.O("t0"));
             else {
                 var b = a.c == Fc ? Z : Z.O(a.c);
-                if (a.D) "t0" != a.c ? J('Command ignored. Use "create" instead of "%s.create"', a.c) : Z.create.apply(Z, a.b);
+                if (a.D) "t0" != a.c ? MWarn('Command ignored. Use "create" instead of "%s.create"', a.c) : Z.create.apply(Z, a.b);
                 else if (a.$) Z.remove(a.c);
                 else if (b)
                     if (a.g) {
@@ -1746,24 +1747,24 @@
                         d = a.A,
                         e = a.b,
                         f;
-                    b.plugins_ || O("Tracker does not have any plugins.");
-                    b.plugins_.get(c) || O("Tracker does not have %s plugin required.", c);
+                    b.plugins_ || MError("Tracker does not have any plugins.");
+                    b.plugins_.get(c) || MError("Tracker does not have %s plugin required.", c);
                     f = b.plugins_.get(c);
-                    f[d] || O("Plugin %s does not have method %s.",
+                    f[d] || MError("Plugin %s does not have method %s.",
                         c, d);
                     f[d].apply(f, e)
                 } else b[a.A].apply(b, a.b);
-                else N("Command ignored. Unknown target: " + b)
+                else MInfo("Command ignored. Unknown target: " + b)
             }
         } catch (ea) {
-            a.s ? O("Exception thrown from pushed function: %s", ea) : a.g ? O("Error creating a plugin instance: %s", a.G) : a.f ? O("Error registering a plugin: %s", a.G) : a.$ ? O("Error removing tracker: %s", a.G) : a.I ? O("Error calling a plugin method: %s", a.G) : O('Called method "%s" threw exception: %s', a.A, ea)
+            a.s ? MError("Exception thrown from pushed function: %s", ea) : a.g ? MError("Error creating a plugin instance: %s", a.G) : a.f ? MError("Error registering a plugin: %s", a.G) : a.$ ? MError("Error removing tracker: %s", a.G) : a.I ? MError("Error calling a plugin method: %s", a.G) : MError('Called method "%s" threw exception: %s', a.A, ea)
         }
     };
     var Z = function(a) {
-        dd("Executing Google Analytics commands.");
+        MGroup("Executing Google Analytics commands.");
         F(1);
         jf.H.apply(jf, [arguments]);
-        ge()
+        MGroupEnd()
     };
     Z.o = {};
     Z.C = [];
@@ -1774,8 +1775,8 @@
         var b = Yb(gd, [].slice.call(arguments));
         b[T] || (b[T] = "t0");
         var c = "" + b[T];
-        if (Z.o[c]) return J("Ignoring create request for duplicate tracking name."), Z.o[c];
-        N("Creating new tracker: " + c);
+        if (Z.o[c]) return MWarn("Ignoring create request for duplicate tracking name."), Z.o[c];
+        MInfo("Creating new tracker: " + c);
         b = new ad(b);
         Z.o[c] = b;
         Z.C.push(b);
@@ -1784,12 +1785,12 @@
     Z.remove = function(a) {
         for (var b = 0; b < Z.C.length; b++)
             if (Z.C[b].get(T) == a) {
-                N("Removing tracker: " + a);
+                MInfo("Removing tracker: " + a);
                 Z.C.splice(b, 1);
                 Z.o[a] = null;
                 return
             }
-        O("Tracker does not exist.")
+        MError("Tracker does not exist.")
     };
     Z.O = function(a) {
         return Z.o[a]
@@ -1798,12 +1799,12 @@
         return Z.C.slice(0)
     };
     Z.P = function() {
-        dd("Initializing Google Analytics.");
+        MGroup("Initializing Google Analytics.");
         "ga" != Fc && F(49);
         var a = Q[Fc];
-        if (a && 42 == a.answer) J("Tracking script already loaded. Abandoning initialization.");
+        if (a && 42 == a.answer) MWarn("Tracking script already loaded. Abandoning initialization.");
         else {
-            a && 42 != a.answer && !a.q && J("An existing object with the name '%s' found. Unexpected results can occur because of this.", Fc);
+            a && 42 != a.answer && !a.q && MWarn("An existing object with the name '%s' found. Unexpected results can occur because of this.", Fc);
             Z.h = a && a.l;
             Z.loaded = !0;
             var b = Q[Fc] = Z;
@@ -1832,9 +1833,9 @@
                     }
                     b = !1
                 }
-                b && (L("Analytics.js is secure, forcing SSL for all hits."), $b = !0)
+                b && (MTrace("Analytics.js is secure, forcing SSL for all hits."), $b = !0)
             }
-            df() || $b || !ye() || (L("Sending all Hits by SSL"), F(36), $b = !0);
+            df() || $b || !ye() || (MTrace("Sending all Hits by SSL"), F(36), $b = !0);
             (Q.gaplugins = Q.gaplugins || {}).Linker = pd;
             b = pd.prototype;
             D("linker", pd);
@@ -1845,12 +1846,12 @@
             a = a && a.q;
             ga(a) ? jf.H.apply(Z, a) : F(50)
         }
-        ge()
+        MGroupEnd()
     };
     Z.ga = function() {
-        for (var a = Z.getAll(), b = 0; b < a.length; b++) dd("Tracker: " + a[b].get(T)), Ja(a[b].a), ge();
+        for (var a = Z.getAll(), b = 0; b < a.length; b++) MGroup("Tracker: " + a[b].get(T)), Ja(a[b].a), MGroupEnd();
         a = I.cookie;
-        dd("Cookie Information");
+        MGroup("Cookie Information");
         for (var a = a.split("; "), b = [
                 ["Name", "Domain", "Path", "Value"]
             ], c = 0; c < a.length; c++) {
@@ -1867,11 +1868,11 @@
             } else /^((__utmt)|(_gat))/.test(e) && b.push([e, "", "", d])
         }
         Xd(b);
-        ge()
+        MGroupEnd()
     };
     Z.dump = Z.ga;
-    Ga("\n                         _                          _       _   _\n                        | |                        | |     | | (_)\n  __ _  ___   ___   __ _| | ___    __ _ _ __   __ _| |_   _| |_ _  ___ ___\n / _` |/ _ \\ / _ \\ / _` | |/ _ \\  / _` | '_ \\ / _` | | | | | __| |/ __/ __|\n| (_| | (_) | (_) | (_| | |  __/ | (_| | | | | (_| | | |_| | |_| | (__\\__ \\\n \\__, |\\___/ \\___/ \\__, |_|\\___|  \\__,_|_| |_|\\__,_|_|\\__, |\\__|_|\\___|___/\n  __/ |             __/ |                              __/ |\n |___/             |___/                              |___/\n");
-    J("Running analytics_debug.js. This script is intended for testing and debugging only.");
+    MLog("<ascii art> google analytics");
+    MWarn("Running analytics_debug.js. This script is intended for testing and debugging only.");
     var E = Z.P,
         K = Q[Fc];
     K && K.r ? E() : A(E);
