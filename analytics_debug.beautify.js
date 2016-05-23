@@ -852,12 +852,12 @@
             e && e.w ? e.w(a, b, c, d) : a.data.set(b, c, d);
             e || MInfo("Set called on unknown field: %s.", b)
         },
-        Ac = function(a, b, c, d, e) {
-            this.name = a;
-            this.i = b;
+        Ac = function(name, shortName, defaultValue, d, e) {
+            this.name = name;
+            this.i = shortName;
+            this.defaultValue = defaultValue;
             this.v = d;
             this.w = e;
-            this.defaultValue = c
         },
         yc = function(a) {
             var b = Ka.get(a);
@@ -881,16 +881,16 @@
             });
             return b && b.name
         },
-        W = function(a, b, c, d, e) {
-            a = new Ac(a, b, c, d, e);
-            Ka.set(a.name, a);
-            return a.name
+        W = function(name, shortName, c, d, e) {
+            var aa = new Ac(name, shortName, c, d, e);
+            Ka.set(aa.name, aa);
+            return aa.name;
         },
         Bc = function(a, b) {
             xc.push([new RegExp("^" + a + "$"), b])
         },
-        X = function(a, b, c) {
-            return W(a, b, c, void 0, Cc)
+        X = function(name, shortName, c) {
+            return W(name, shortName, c, undefined, Cc)
         },
         Cc = function(a, b) {
             MError("Ignored attempt to update read-only property: " + b)
