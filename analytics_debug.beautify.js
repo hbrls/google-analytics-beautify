@@ -52,9 +52,9 @@
             b.height = 1;
             b.src = a;
             return b
-        },
-        Aa = function() {},
-        P = function(a) {
+    };
+    var noop = function () {};
+    var P = function(a) {
             if (encodeURIComponent instanceof Function) return encodeURIComponent(a);
             F(28);
             return a
@@ -601,7 +601,7 @@
             this.message = a + "-8192"
         },
         da = function(a, b, c) {
-            c = c || Aa;
+            c = c || noop;
             if (2036 >= b.length) id(a, b, c), Ia(b);
             else if (8192 >= b.length) u(a, b, c) || te(a, b, c) || id(a, b, c), Ia(b);
             else throw MError("Payload size is too large (%s).  Max allowed is %s.", b.length, 8192), fc("len", b.length), new bc(b.length);
@@ -640,7 +640,7 @@
                 c && d.push("_m=" + P(c.substring(0, 100)));
                 d.push("aip=1");
                 d.push("z=" + ae());
-                id(hd() + "/collect", d.join("&"), Aa)
+                id(hd() + "/collect", d.join("&"), noop)
             }
         };
     var h = function(a) {
@@ -665,7 +665,7 @@
             MTrace("Aborted execution due to exception: " + d)
         }
         b = a.get(Nb);
-        b != Aa && t(b) && (MTrace("Manually firing callback"), a.set(Nb, Aa, !0), setTimeout(b, 10))
+        b != noop && t(b) && (MTrace("Manually firing callback"), a.set(Nb, noop, !0), setTimeout(b, 10))
     };
 
     function hc(a) {
@@ -706,7 +706,7 @@
             var d = V(a, Na),
                 e = a.get(Nb);
             8192 < d.length && MError("Payload size is too large (%s).  Max allowed is %s.", d.length, 8192);
-            e = e || Aa;
+            e = e || noop;
             MInfo("Sending hit with transport method %s", c);
             "image" == c ? (id(b, d, e), Ia(d)) : "xhr" == c && te(b, d, e) ? Ia(d) : "beacon" == c && u(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), da(b, d, e))
         } else da(b, V(a, Na), a.get(Nb));
@@ -716,7 +716,7 @@
         b.hitcount = c ? c + 1 : 1;
         b = a.get(U);
         delete h(b).pending_experiments;
-        a.set(Nb, Aa, !0)
+        a.set(Nb, noop, !0)
     }
 
     function td(a) {
@@ -1877,7 +1877,7 @@
         K = Q[Fc];
     K && K.r ? E() : A(E);
     A(function() {
-        jf.H(["provide", "render", Aa])
+        jf.H(["provide", "render", noop])
     });
 
     function ic(a) {
