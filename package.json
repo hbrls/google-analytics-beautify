@@ -1,0 +1,22 @@
+{
+  "name": "google-analytics-beautify",
+  "version": "1.0.0",
+  "description": "人肉反编译 https://www.google-analytics.com/analytics_debug.js",
+  "main": "analytics_debug.beautify.js",
+  "scripts": {
+    "keepup": "rm -f analytics_debug.js && wget https://www.google-analytics.com/analytics_debug.js && js-beautify analytics_debug.js --outfile jsbeautifier.org.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hbrls/google-analytics-beautify.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hbrls/google-analytics-beautify/issues"
+  },
+  "homepage": "https://github.com/hbrls/google-analytics-beautify",
+  "devDependencies": {
+    "js-beautify": "1.6.2"
+  }
+}
