@@ -46,12 +46,12 @@
     var trim = function (a) {
         return a ? a.replace(/^[\s\xa0]+|[\s\xa0]+$/g, "") : "";
     };
-    var za = function(a) {
-            var b = I.createElement("img");
-            b.width = 1;
-            b.height = 1;
-            b.src = a;
-            return b
+    var createImg = function(a) {
+        var img = document.createElement("img");
+        img.width = 1;
+        img.height = 1;
+        img.src = a;
+        return img;
     };
     var noop = function () {};
     var P = function(a) {
@@ -594,55 +594,90 @@
         fe = /^(www\.)?google(\.com?)?(\.[a-z]{2})?$/,
         Wd = /(^|\.)doubleclick\.net$/i;
     var hd = function() {
-            return ($b || df() ? "https:" : "http:") + "//www.google-analytics.com"
-        },
-        bc = function(a) {
-            this.name = "len";
-            this.message = a + "-8192"
-        },
-        da = function(a, b, c) {
-            c = c || noop;
-            if (2036 >= b.length) id(a, b, c), Ia(b);
-            else if (8192 >= b.length) u(a, b, c) || te(a, b, c) || id(a, b, c), Ia(b);
-            else throw MError("Payload size is too large (%s).  Max allowed is %s.", b.length, 8192), fc("len", b.length), new bc(b.length);
-        },
-        id = function(a, b, c) {
-            var d = za(a + "?" + b);
-            d.onload = d.onerror = function() {
-                d.onload = null;
-                d.onerror = null;
-                c()
+        return ($b || df() ? "https:" : "http:") + "//www.google-analytics.com"
+    };
+    var PayloadTooLargeException = function (dataLength) {
+        this.name = "len";
+        this.message = dataLength + "-8192";
+    };
+    var send = function(url, data, callback) {
+        callback = callback || noop;
+        if (2036 >= data.length) {
+            sendImage(url, data, callback);
+            Ia(data);
+        } else if (8192 >= data.length) {
+            if (!sendBeacon(url, data, callback)) {
+                if (!sendXHR(url, data, callback)) {
+                    sendImage(url, data, callback);
+                    Ia(data);
+                }
             }
-        },
-        te = function(a, b, c) {
-            var d =
-                Q.XMLHttpRequest;
-            if (!d) return !1;
-            var e = new d;
-            if (!("withCredentials" in e)) return !1;
-            e.open("POST", a, !0);
-            e.withCredentials = !0;
-            e.setRequestHeader("Content-Type", "text/plain");
-            e.onreadystatechange = function() {
-                4 == e.readyState && (c(), e = null)
-            };
-            e.send(b);
-            return !0
-        },
-        u = function(a, b, c) {
-            return Q.navigator.sendBeacon ? Q.navigator.sendBeacon(a, b) ? (c(), !0) : !1 : !1
-        },
-        fc = function(a, b, c) {
-            MError("Error: type=%s method=%s message=%s account=%s", arguments);
-            if (!(1 <= 100 * Math.random() || ld("?"))) {
-                var d = ["t=error", "_e=" + a, "_v=j43d", "sr=1"];
-                b && d.push("_f=" + b);
-                c && d.push("_m=" + P(c.substring(0, 100)));
-                d.push("aip=1");
-                d.push("z=" + ae());
-                id(hd() + "/collect", d.join("&"), noop)
+        } else {
+            MError("Payload size is too large (%s).  Max allowed is %s.", data.length, 8192);
+            sendError("len", data.length);
+            throw new PayloadTooLargeException(data.length);
+        }
+    };
+    var sendImage = function(url, data, callback) {
+        var img = createImg(url + "?" + data);
+        img.onload = img.onerror = function () {
+            img.onload = null;
+            img.onerror = null;
+            callback();
+        };
+    };
+    var sendXHR = function(url, data, callback) {
+        if (!window.XMLHttpRequest)  {
+            return false;
+        }
+
+        var xhr = new window.XMLHttpRequest();
+        if (!("withCredentials" in xhr)) {
+            return false
+        };
+
+        xhr.open("POST", url, true);
+        xhr.withCredentials = true;
+        xhr.setRequestHeader("Content-Type", "text/plain");
+        xhr.onreadystatechange = function () {
+            if (4 == xhr.readyState) {
+                callback();
+                xhr = null;
             }
         };
+        xhr.send(data);
+        return true;
+    };
+    var sendBeacon = function(url, data, callback) {
+        // ** It's useless at this moment. 2016.May.23.
+        //    http://caniuse.com/#feat=beacon
+        if (Q.navigator.sendBeacon) {
+            if (Q.navigator.sendBeacon(url, data)) {
+                callback();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    };
+    var sendError = function(type, method, message, account) {
+        MError("Error: type=%s method=%s message=%s account=%s", [type, method, message, account]);
+        // ** It seems like a 1% sampling
+        if (!(1 <= 100 * Math.random() || ld("?"))) {
+            var d = ["t=error", "_e=" + type, "_v=j43d", "sr=1"];
+            if (method) {
+                d.push("_f=" + method);
+            }
+            if (message) {
+                d.push("_m=" + P(message.substring(0, 100)));
+            }
+            d.push("aip=1");
+            d.push("z=" + ae());
+            sendImage(hd() + "/collect", d.join("&"), noop)
+        }
+    };
     var h = function(a) {
         var b = Q.gaData = Q.gaData || {};
         return b[a] = b[a] || {}
@@ -708,8 +743,8 @@
             8192 < d.length && MError("Payload size is too large (%s).  Max allowed is %s.", d.length, 8192);
             e = e || noop;
             MInfo("Sending hit with transport method %s", c);
-            "image" == c ? (id(b, d, e), Ia(d)) : "xhr" == c && te(b, d, e) ? Ia(d) : "beacon" == c && u(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), da(b, d, e))
-        } else da(b, V(a, KEY$hitPayload), a.get(KEY$hitCallback));
+            "image" == c ? (sendImage(b, d, e), Ia(d)) : "xhr" == c && sendXHR(b, d, e) ? Ia(d) : "beacon" == c && sendBeacon(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), send(b, d, e))
+        } else send(b, V(a, KEY$hitPayload), a.get(KEY$hitCallback));
         b = a.get(KEY$trackingId);
         b = h(b);
         c = b.hitcount;
@@ -992,7 +1027,7 @@
             try {
                 return d && F(d), c.apply(this, arguments)
             } catch (b) {
-                throw fc("exc", a, b && b.name), b;
+                throw sendError("exc", a, b && b.name), b;
             }
         }
     };
@@ -1342,7 +1377,7 @@
                 });
                 e += "z=" + ae();
                 od(c, e);
-                za(e);
+                createImg(e);
                 b.set(a.Y, "", !0)
             }
         },
