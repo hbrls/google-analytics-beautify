@@ -682,9 +682,13 @@
             sendImage(hd() + "/collect", d.join("&"), noop)
         }
     };
-    var h = function(a) {
-        var b = Q.gaData = Q.gaData || {};
-        return b[a] = b[a] || {}
+    /**
+     * @param gaId [String], e.g. "UA-xxxxxxx-xx"
+     */
+    var getDataByGAId = function(gaId) {
+        window.gaData = window.gaData || {};
+        window.gaData[gaId] = window.gaData[gaId] || {};
+        return window.gaData[gaId];
     };
     var gc = function() {
         this.m = []
@@ -750,11 +754,11 @@
             "image" == c ? (sendImage(b, d, e), Ia(d)) : "xhr" == c && sendXHR(b, d, e) ? Ia(d) : "beacon" == c && sendBeacon(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), send(b, d, e))
         } else send(b, V(a, KEY$hitPayload), a.get(KEY$hitCallback));
         b = a.get(KEY$trackingId);
-        b = h(b);
+        b = getDataByGAId(b);
         c = b.hitcount;
         b.hitcount = c ? c + 1 : 1;
         b = a.get(KEY$trackingId);
-        delete h(b).pending_experiments;
+        delete getDataByGAId(b).pending_experiments;
         a.set(KEY$hitCallback, noop, !0)
     }
 
@@ -763,7 +767,7 @@
         (Q.gaData = Q.gaData || {}).expVar && a.set(KEY$expVar, (Q.gaData = Q.gaData || {}).expVar);
         var b;
         var c = a.get(KEY$trackingId);
-        if (c = h(c).pending_experiments) {
+        if (c = getDataByGAId(c).pending_experiments) {
             var d = [];
             for (b in c) c.hasOwnProperty(b) && c[b] && d.push(encodeURIComponent(b) + "." + encodeURIComponent(c[b]));
             b = d.join("!")
