@@ -1797,17 +1797,37 @@
         }
         jf.j = jf.j.concat(b)
     };
-    jf.N = function(a) {
-        for (var b = [], c = 0; c < arguments.length; c++) try {
-            var d = new parseQ(arguments[c]);
-            d.f ? (D(d.b[0], d.b[1]), MInfo("Registered new plugin: ga(provide, %s, Function)", d.b[0])) : (d.g && (d.ha = z(d.c, d.b[0], d.da, d.ba)), b.push(d))
-        } catch (l) {
-            var e = arguments[c],
-                f = d,
-                ea = l;
-            isArray(e) || isFunction(e) ? isArray(e) && !isString(e[0]) ? MError("First element of command array is not a string: %s", e) : f && f.g ? MError("Invalid require command: %s", e) : MError("Command failure: %s", ea) : MError("Command is not an array or function: %s", ea)
+    jf.N = function(...args) {
+        var b = []
+        for (var i = 0; i < args.length; i++) {
+            try {
+                var d = new parseQ(args[i]);
+                if (d.f) {
+                    D(d.b[0], d.b[1]);
+                    MInfo("Registered new plugin: ga(provide, %s, Function)", d.b[0]);
+                } else if (d.g) {
+                    d.ha = z(d.c, d.b[0], d.da, d.ba);
+                    b.push(d);
+                }
+            } catch (error) {
+                var e = args[i];
+                var f = d;
+                if (isArray(e) || isFunction(e)) {
+                    if (isArray(e) && !isString(e[0])) {
+                        MError("First element of command array is not a string: %s", e);
+                    } else {
+                        if (f && f.g) {
+                            MError("Invalid require command: %s", e);
+                        } else {
+                            MError("Command failure: %s", error);
+                        }
+                    }
+                } else {
+                    MError("Command is not an array or function: %s", error);
+                }
+            }
         }
-        return b
+        return b;
     };
     jf.R = function(a) {
         try {
