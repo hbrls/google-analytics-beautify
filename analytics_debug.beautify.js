@@ -895,7 +895,7 @@
         Cc = function(a, b) {
             MError("Ignored attempt to update read-only property: " + b)
         };
-    var Fc = isString(window.GoogleAnalyticsObject) && trim(window.GoogleAnalyticsObject) || "ga";
+    var libName = isString(window.GoogleAnalyticsObject) && trim(window.GoogleAnalyticsObject) || "ga";
     var $b = !1;
     var KEY$apiVersion = X("apiVersion", "v");
     var KEY$clientVersion = X("clientVersion", "_v");
@@ -1618,26 +1618,70 @@
                 $on(I, "visibilitychange", c)
             }
         };
-    var qe = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/,
-        se = function(a) {
-            this.G = a;
-            if (isFunction(a[0])) this.s = a[0];
-            else {
-                var b = qe.exec(a[0]);
-                null != b && 4 == b.length && (this.c = b[1] || "t0", this.I = b[2] || "", this.A = b[3], this.b = [].slice.call(a, 1), this.I || (this.D = "create" == this.A, this.g = "require" == this.A, this.f = "provide" == this.A, this.$ = "remove" == this.A), this.g && (3 <= this.b.length ? (this.da = this.b[1], this.ba = this.b[2]) : this.b[1] && (isString(this.b[1]) ? this.da = this.b[1] : this.ba = this.b[1])));
-                var b = a[1],
-                    c = a[2];
-                if (!this.A) throw MError("Invalid command: " + a), "abort";
-                if (this.g && (!isString(b) || "" == b)) throw MError("Invalid require command.", a), "abort";
-                if (this.f && (!isString(b) || "" == b || !isFunction(c))) throw MError("Invalid provide command.", a), "abort";
-                if (re(this.c) || re(this.I)) throw MError('Target name and plugin names should not contain "." or ":"'), "abort";
-                if (this.f && "t0" != this.c) throw MError("Provide command should not be preceeded by a tracker name."), "abort";
-            }
-        };
+    var REG_COMMAND = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/; // [trackerName.][pluginName:]methodName
+    var se = function (a) {
+        this.G = a;
+        var command = a[0];
+        if (isFunction(command)) {
+            this.s = command;
+        } else {
+            var b = REG_COMMAND.exec(command);
+            if (null != b && 4 == b.length) {
+                this.c = b[1] || "t0"; // trackerName
+                this.I = b[2] || "";   // pluginName
+                this.A = b[3];         // methodName
+                this.b = [].slice.call(a, 1);
 
-    function re(a) {
-        return 0 <= a.indexOf(".") || 0 <= a.indexOf(":")
+                if (!this.I) {
+                    this.D = "create" == this.A;
+                    this.g = "require" == this.A;
+                    this.f = "provide" == this.A;
+                    this.$ = "remove" == this.A;
+                }
+
+                if (this.g) {
+                    if (3 <= this.b.length) {
+                        this.da = this.b[1];
+                        this.ba = this.b[2];
+                    } else if (this.b[1]) {
+                        if (isString(this.b[1])) {
+                            this.da = this.b[1];
+                        } else {
+                            this.ba = this.b[1];
+                        }
+                    }
+                }
+            }
+
+            var b = a[1];
+            var c = a[2];
+            if (!this.A) {
+                MError("Invalid command: " + a);
+                throw "abort";
+            }
+            if (this.g && (!isString(b) || "" == b)) {
+                MError("Invalid require command.", a);
+                throw "abort";
+            }
+            if (this.f && (!isString(b) || "" == b || !isFunction(c))) {
+                MError("Invalid provide command.", a);
+                throw "abort";
+            }
+            if (isInvalidTargetNamePluginName(this.c) || isInvalidTargetNamePluginName(this.I)) {
+                MError('Target name and plugin names should not contain "." or ":"');
+                throw "abort";
+            }
+            if (this.f && "t0" != this.c) {
+                MError("Provide command should not be preceeded by a tracker name.");
+                throw "abort";
+            }
+        }
     };
+
+    function isInvalidTargetNamePluginName(name) {
+        return 0 <= name.indexOf(".") || 0 <= name.indexOf(":");
+    };
+
     var Re, Se, Te, B;
     Re = new ef;
     Te = new ef;
@@ -1648,7 +1692,7 @@
         linkid: 47
     };
     var x = function(a, b, c) {
-            var d = b == Z ? Fc : b.get(KEY$name),
+            var d = b == Z ? libName : b.get(KEY$name),
                 e = Re.get(a);
             if (!isFunction(e)) return MInfo("Waiting on require of %s to be fulfilled.", a), !1;
             b.plugins_ = b.plugins_ || new ef;
@@ -1777,7 +1821,7 @@
         try {
             if (a.s) a.s.call(Q, Z.O("t0"));
             else {
-                var b = a.c == Fc ? Z : Z.O(a.c);
+                var b = a.c == libName ? Z : Z.O(a.c);
                 if (a.D) "t0" != a.c ? MWarn('Command ignored. Use "create" instead of "%s.create"', a.c) : Z.create.apply(Z, a.b);
                 else if (a.$) Z.remove(a.c);
                 else if (b)
@@ -1841,53 +1885,67 @@
     };
     Z.P = function() {
         MGroup("Initializing Google Analytics.");
-        "ga" != Fc && F(49);
-        var a = Q[Fc];
-        if (a && 42 == a.answer) MWarn("Tracking script already loaded. Abandoning initialization.");
-        else {
-            a && 42 != a.answer && !a.q && MWarn("An existing object with the name '%s' found. Unexpected results can occur because of this.", Fc);
-            Z.h = a && a.l;
-            Z.loaded = !0;
-            var b = Q[Fc] = Z;
+        "ga" != libName && F(49);
+        var lib = window[libName];
+        if (lib && 42 == lib.answer) {
+            MWarn("Tracking script already loaded. Abandoning initialization.");
+        } else {
+            if (lib && 42 != lib.answer && !lib.q) {
+                MWarn("An existing object with the name '%s' found. Unexpected results can occur because of this.", libName);
+            }
+            Z.h = lib && lib.l;
+            Z.loaded = true;
+
+            var b = window[libName] = Z;
             Y("create", b, b.create);
             Y("remove", b, b.remove);
             Y("getByName", b, b.O, 5);
             Y("getAll", b, b.getAll, 6);
             Y("dump", b, b.dump);
-            b = ad.prototype;
-            Y("get", b, b.get, 7);
-            Y("set", b, b.set, 4);
-            Y("send", b, b.send);
-            Y("requireSync", b, b.pa);
-            b = wc.prototype;
-            Y("get", b, b.get);
-            Y("set", b, b.set);
+
+            var b1 = ad.prototype;
+            Y("get", b1, b1.get, 7);
+            Y("set", b1, b1.set, 4);
+            Y("send", b1, b1.send);
+            Y("requireSync", b1, b1.pa);
+
+            var b2 = wc.prototype;
+            Y("get", b2, b2.get);
+            Y("set", b2, b2.set);
+
+            var scripts = document.getElementsByTagName("script");
+            var bFlag;
             if (!df() && !$b) {
-                a: {
-                    for (var b = I.getElementsByTagName("script"), c = 0; c < b.length && 100 > c; c++) {
-                        var d = b[c].src;
+                loopLabel: {
+                    for (var i = 0; i < scripts.length && 100 > i; i++) {
+                        var d = scripts[i].src;
                         if (d && 0 == d.indexOf("https://www.google-analytics.com/analytics")) {
                             F(33);
-                            b = !0;
-                            break a
+                            bFlag = true;
+                            break loopLabel;
                         }
                     }
-                    b = !1
+                    bFlag = false;
                 }
-                b && (MTrace("Analytics.js is secure, forcing SSL for all hits."), $b = !0)
+                if (bFlag) {
+                    MTrace("Analytics.js is secure, forcing SSL for all hits.");
+                    $b = true;
+                }
             }
             df() || $b || !ye() || (MTrace("Sending all Hits by SSL"), F(36), $b = !0);
             (Q.gaplugins = Q.gaplugins || {}).Linker = pd;
-            b = pd.prototype;
+
+            var b3 = pd.prototype;
             D("linker", pd);
-            Y("decorate", b, b.S, 20);
-            Y("autoLink", b, b.U, 25);
+            Y("decorate", b3, b3.S, 20);
+            Y("autoLink", b3, b3.U, 25);
             D("displayfeatures", $d);
             D("adfeatures", $d);
-            a = a && a.q;
-            isArray(a) ? jf.H.apply(Z, a) : F(50)
+
+            var q = lib && lib.q;
+            isArray(q) ? jf.H.apply(Z, q) : F(50);
         }
-        MGroupEnd()
+        MGroupEnd();
     };
     Z.ga = function() {
         for (var a = Z.getAll(), b = 0; b < a.length; b++) MGroup("Tracker: " + a[b].get(KEY$name)), Ja(a[b].a), MGroupEnd();
@@ -1915,7 +1973,7 @@
     MLog("<ascii art> google analytics");
     MWarn("Running analytics_debug.js. This script is intended for testing and debugging only.");
     var E = Z.P,
-        K = Q[Fc];
+        K = Q[libName];
     K && K.r ? E() : A(E);
     A(function() {
         jf.H(["provide", "render", noop])
