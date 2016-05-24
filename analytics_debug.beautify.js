@@ -1590,27 +1590,29 @@
             x(a, c, b)
         }), z(String(c.get(KEY$name)), a, void 0, b, !0))
     };
-    var cd = function(a) {
-            if ("prerender" == I.visibilityState) return !1;
-            a();
-            return !0
-        };
-    var A = function(a) {
-        if (!cd(a)) {
+    var onVisible = function (f) {
+        if ("prerender" == I.visibilityState) {
+            return false;
+        }
+        f();
+        return true;
+    };
+    var ready = function (f) {
+        if (!onVisible(f)) {
             F(16);
-            var b = !1,
-                c = function() {
-                    if (!b && cd(a)) {
-                        b = !0;
-                        var self = c;
-                        if (document.removeEventListener) {
-                            document.removeEventListener("visibilitychange", self, false);
-                        } else {
-                            document.detachEvent && e.detachEvent("onvisibilitychange", self);
-                        }
+            var hasBeenVisible = false;
+            var onVisibilityChange = function() {
+                if (!hasBeenVisible && onVisible(f)) {
+                    hasBeenVisible = true;
+                    var self = onVisibilityChange;
+                    if (document.removeEventListener) {
+                        document.removeEventListener("visibilitychange", self, false);
+                    } else {
+                        document.detachEvent && e.detachEvent("onvisibilitychange", self);
                     }
-                };
-            $on(document, "visibilitychange", c)
+                }
+            };
+            $on(document, "visibilitychange", onVisibilityChange)
         }
     };
     var REG_COMMAND = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/; // [trackerName.][pluginName:]methodName
@@ -1995,8 +1997,8 @@
     MWarn("Running analytics_debug.js. This script is intended for testing and debugging only.");
     var E = Z.P,
         K = Q[libName];
-    K && K.r ? E() : A(E);
-    A(function() {
+    K && K.r ? E() : ready(E);
+    ready(function() {
         jf.H(["provide", "render", noop])
     });
 
