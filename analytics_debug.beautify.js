@@ -1845,10 +1845,10 @@
             a.s ? MError("Exception thrown from pushed function: %s", ea) : a.g ? MError("Error creating a plugin instance: %s", a.G) : a.f ? MError("Error registering a plugin: %s", a.G) : a.$ ? MError("Error removing tracker: %s", a.G) : a.I ? MError("Error calling a plugin method: %s", a.G) : MError('Called method "%s" threw exception: %s', a.A, ea)
         }
     };
-    var Z = function(a) {
+    var Z = function(...args) {
         MGroup("Executing Google Analytics commands.");
         F(1);
-        jf.H.apply(jf, [arguments]);
+        jf.H.apply(jf, [args]);
         MGroupEnd()
     };
     Z.o = {};
