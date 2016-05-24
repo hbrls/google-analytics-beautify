@@ -1594,22 +1594,25 @@
             if ("prerender" == I.visibilityState) return !1;
             a();
             return !0
-        },
-        A = function(a) {
-            if (!cd(a)) {
-                F(16);
-                var b = !1,
-                    c = function() {
-                        if (!b && cd(a)) {
-                            b = !0;
-                            var d = c,
-                                e = I;
-                            e.removeEventListener ? e.removeEventListener("visibilitychange", d, !1) : e.detachEvent && e.detachEvent("onvisibilitychange", d)
-                        }
-                    };
-                $on(I, "visibilitychange", c)
-            }
         };
+    var A = function(a) {
+        if (!cd(a)) {
+            F(16);
+            var b = !1,
+                c = function() {
+                    if (!b && cd(a)) {
+                        b = !0;
+                        var self = c;
+                        if (document.removeEventListener) {
+                            document.removeEventListener("visibilitychange", self, false);
+                        } else {
+                            document.detachEvent && e.detachEvent("onvisibilitychange", self);
+                        }
+                    }
+                };
+            $on(document, "visibilitychange", c)
+        }
+    };
     var REG_COMMAND = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/; // [trackerName.][pluginName:]methodName
     var parseQ = function (a) {
         this.G = a;
