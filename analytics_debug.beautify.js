@@ -68,15 +68,19 @@
             }
             F(28);
             return a
-        },
-        Ca = function(a, b, c, d) {
-            try {
-                a.addEventListener ? a.addEventListener(b, c, !!d) : a.attachEvent && a.attachEvent("on" + b, c)
-            } catch (e) {
-                F(27)
+        };
+    var $on = function(el, event, listener, useCapture) {
+        try {
+            if (el.addEventListener) {
+                el.addEventListener(event, listener, !!useCapture);
+            } else if (el.attachEvent) {
+                el.attachEvent("on" + event, listener);
             }
-        },
-        g = /^[\w\-:/.?=&%!]+$/,
+        } catch () {
+            F(27);
+        }
+    };
+    var g = /^[\w\-:/.?=&%!]+$/,
         Ea = function(a, b, c) {
             a && (MInfo("Loading script: %s", a), c ? (c = "", b && (g.test(b) ? c = ' id="' + b + '"' : MWarn("Dropping invalid script ID: %s", b)), g.test(a) ? I.write("<script" + c + ' src="' + a + '">\x3c/script>') : MWarn("URL uses invalid characters. Dropping request for: %s",
                 a)) : (c = I.createElement("script"), c.type = "text/javascript", c.async = !0, c.src = a, b && (c.id = b), a = I.getElementsByTagName("script")[0], a.parentNode.insertBefore(c, a)))
@@ -1071,7 +1075,7 @@
             if (ic(V(a, KEY$clientId)) % 100 >= c) MTrace("Site speed data not sent - visitor sampled out");
             else if (c = {}, qd(c) || rd(c)) {
                 var d = c[KEY$l1];
-                void 0 == d || Infinity == d || isNaN(d) ? MTrace("Site speed data not sent - unsupported browser") : 0 < d ? (Rc(c, KEY$l3), Rc(c, KEY$l6), Rc(c, KEY$l5), Rc(c, KEY$l2), Rc(c, KEY$l4), Rc(c, KEY$l7), Rc(c, KEY$l8), b(c)) : (MTrace("Site speed data not available - waiting for onload"), Ca(Q, "load", function() {
+                void 0 == d || Infinity == d || isNaN(d) ? MTrace("Site speed data not sent - unsupported browser") : 0 < d ? (Rc(c, KEY$l3), Rc(c, KEY$l6), Rc(c, KEY$l5), Rc(c, KEY$l2), Rc(c, KEY$l4), Rc(c, KEY$l7), Rc(c, KEY$l8), b(c)) : (MTrace("Site speed data not available - waiting for onload"), $on(Q, "load", function() {
                     Sc(a, b)
                 }, !1))
             } else MTrace("Site speed data not sent - unsupported browser")
@@ -1291,7 +1295,7 @@
             }
         }
         var e = this;
-        this.X || (this.X = !0, Ca(I, "mousedown", d, !1), Ca(I, "keyup", d, !1));
+        this.X || (this.X = !0, $on(I, "mousedown", d, !1), $on(I, "keyup", d, !1));
         if (c) {
             c = function(b) {
                 b = b || Q.event;
@@ -1300,7 +1304,7 @@
                     c && ne(a, c[1]) && me(e, b)
                 }
             };
-            for (var f = 0; f < I.forms.length; f++) Ca(I.forms[f], "submit", c)
+            for (var f = 0; f < I.forms.length; f++) $on(I.forms[f], "submit", c)
         }
     };
 
@@ -1607,7 +1611,7 @@
                             e.removeEventListener ? e.removeEventListener("visibilitychange", d, !1) : e.detachEvent && e.detachEvent("onvisibilitychange", d)
                         }
                     };
-                Ca(I, "visibilitychange", c)
+                $on(I, "visibilitychange", c)
             }
         };
     var qe = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/,
