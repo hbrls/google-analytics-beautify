@@ -1440,61 +1440,67 @@
             Nd = !0
         }
     };
-    var va = /^(UA|YT|MO|GP)-(\d+)-(\d+)$/,
-        ad = function(a) {
-            function b(a, b) {
-                d.a.data.set(a, b)
-            }
+    var va = /^(UA|YT|MO|GP)-(\d+)-(\d+)$/;
+    var Tracker = function(fieldsObject) {
+        var that = this;
+        this.a = new wc;
+        this.filters = new gc;
 
-            function c(a, c) {
-                b(a, c);
-                d.filters.add(a)
-            }
-            var d = this;
-            this.a = new wc;
-            this.filters = new gc;
-            MTrace("Initializing tracker");
-            b(KEY$name, a[KEY$name]);
-            b(KEY$trackingId, trim(a[KEY$trackingId]));
-            b(KEY$cookieName, a[KEY$cookieName]);
-            b(KEY$cookieDomain, a[KEY$cookieDomain] || Wb());
-            b(KEY$cookiePath, a[KEY$cookiePath]);
-            b(KEY$cookieExpires, a[KEY$cookieExpires]);
-            b(KEY$legacyCookieDomain, a[KEY$legacyCookieDomain]);
-            b(KEY$legacyHistoryImport, a[KEY$legacyHistoryImport]);
-            b(KEY$allowLinker, a[KEY$allowLinker]);
-            b(KEY$allowAnchor, a[KEY$allowAnchor]);
-            b(KEY$sampleRate, a[KEY$sampleRate]);
-            b(KEY$siteSpeedSampleRate, a[KEY$siteSpeedSampleRate]);
-            b(KEY$alwaysSendReferrer, a[KEY$alwaysSendReferrer]);
-            b(KEY$storage, a[KEY$storage]);
-            b(KEY$userId, a[KEY$userId]);
-            b(KEY$clientIdTime, a[KEY$clientIdTime]);
-            b(KEY$apiVersion, 1);
-            b(KEY$clientVersion, "j43d");
-            c(KEY$_oot, kc);
-            c(KEY$previewTask, Ud);
-            c(KEY$checkProtocolTask, lc);
-            c(KEY$validationTask, ya);
-            c(KEY$checkStorageTask, Zc);
-            c(KEY$historyImportTask, Kd);
-            c(KEY$samplerTask, hc);
-            c(KEY$_rlt, qc);
-            c(KEY$ceTask, td);
-            c(KEY$devIdTask, ve);
-            c(KEY$displayFeaturesTask, Me);
-            c(KEY$buildHitTask, mc);
-            c("_dt", nc);
-            c(KEY$sendHitTask, pc);
-            c(KEY$timingTask, ze(this));
-            vd(this.a, a[KEY$clientId]);
-            wd(this.a);
-            this.a.set(KEY$adSenseId, He());
-            Od(this.a.get(KEY$trackingId), this.a.get(KEY$cookieDomain), this.a.get(KEY$cookiePath));
-            Td(a);
-            MTrace("Initialization complete\n\n")
-        },
-        vd = function(a, b) {
+        function b(key, value) {
+            that.a.data.set(key, value);
+        }
+
+        function c(key, value) {
+            b(key, value);
+            that.filters.add(key);
+        }
+
+        MVerbose("Initializing tracker");
+
+        b(KEY$name, fieldsObject[KEY$name]);
+        b(KEY$trackingId, trim(fieldsObject[KEY$trackingId]));
+        b(KEY$cookieName, fieldsObject[KEY$cookieName]);
+        b(KEY$cookieDomain, fieldsObject[KEY$cookieDomain] || Wb());
+        b(KEY$cookiePath, fieldsObject[KEY$cookiePath]);
+        b(KEY$cookieExpires, fieldsObject[KEY$cookieExpires]);
+        b(KEY$legacyCookieDomain, fieldsObject[KEY$legacyCookieDomain]);
+        b(KEY$legacyHistoryImport, fieldsObject[KEY$legacyHistoryImport]);
+        b(KEY$allowLinker, fieldsObject[KEY$allowLinker]);
+        b(KEY$allowAnchor, fieldsObject[KEY$allowAnchor]);
+        b(KEY$sampleRate, fieldsObject[KEY$sampleRate]);
+        b(KEY$siteSpeedSampleRate, fieldsObject[KEY$siteSpeedSampleRate]);
+        b(KEY$alwaysSendReferrer, fieldsObject[KEY$alwaysSendReferrer]);
+        b(KEY$storage, fieldsObject[KEY$storage]);
+        b(KEY$userId, fieldsObject[KEY$userId]);
+        b(KEY$clientIdTime, fieldsObject[KEY$clientIdTime]);
+        b(KEY$apiVersion, 1);
+        b(KEY$clientVersion, "j43d");
+
+        c(KEY$_oot, kc);
+        c(KEY$previewTask, Ud);
+        c(KEY$checkProtocolTask, lc);
+        c(KEY$validationTask, ya);
+        c(KEY$checkStorageTask, Zc);
+        c(KEY$historyImportTask, Kd);
+        c(KEY$samplerTask, hc);
+        c(KEY$_rlt, qc);
+        c(KEY$ceTask, td);
+        c(KEY$devIdTask, ve);
+        c(KEY$displayFeaturesTask, Me);
+        c(KEY$buildHitTask, mc);
+        c("_dt", nc);
+        c(KEY$sendHitTask, pc);
+        c(KEY$timingTask, ze(this));
+
+        vd(this.a, fieldsObject[KEY$clientId]);
+        wd(this.a);
+        this.a.set(KEY$adSenseId, He());
+        Od(this.a.get(KEY$trackingId), this.a.get(KEY$cookieDomain), this.a.get(KEY$cookiePath));
+        Td(fieldsObject);
+
+        MTrace("Initialization complete\n\n");
+    };
+    var vd = function(a, b) {
             if ("cookie" == getString(a, KEY$storage)) {
                 Tc = !1;
                 var c;
