@@ -831,10 +831,22 @@
         Ka = new ef,
         xc = [];
     wc.prototype.get = function(a) {
-        var b = yc(a),
-            c = this.data.get(a);
-        b && void 0 == c && (c = isFunction(b.defaultValue) ? b.defaultValue() : b.defaultValue);
-        return b && b.v ? b.v(this, a, c) : c
+        var b = yc(a);
+        var c = this.data.get(a);
+
+        if (b && undefined == c) {
+            if (isFunction(b.defaultValue)) {
+                c = b.defaultValue();
+            } else {
+                c = b.defaultValue;
+            }
+        }
+
+        if (b && b.v) {
+            return b.v(this, a, c);
+        } else {
+            return c;
+        }
     };
     var getString = function(store, key) {
         var value = store.get(key);
@@ -849,10 +861,17 @@
             return void 0 == c || "" === c ? 0 : 1 * c
         };
     wc.prototype.set = function(a, b, c) {
-        if (a)
-            if ("object" == typeof a)
-                for (var d in a) a.hasOwnProperty(d) && zc(this, d, a[d], c);
-            else zc(this, a, b, c)
+        if (a) {
+            if ("object" == typeof a) {
+                for (var k in a) {
+                    if (a.hasOwnProperty(k)) {
+                        zc(this, k, a[k], c);
+                    }
+                }
+            } else {
+                zc(this, a, b, c);
+            }
+        }
     };
     var zc = function(a, b, c, d) {
             La(b, c);
