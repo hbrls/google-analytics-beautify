@@ -866,23 +866,23 @@
             this.defaultValue = defaultValue;
             this.v = d;
             this.w = e;
-        },
-        yc = function(a) {
-            var b = Ka.get(a);
-            if (!b)
-                for (var c = 0; c < xc.length; c++) {
-                    var d = xc[c],
-                        e = d[0].exec(a);
-                    if (e) {
-                        MTrace("Generating new model field for name: " + a);
-                        b = d[1](e);
-                        Ka.set(b.name, b);
-                        break
-                    }
+        };
+    var yc = function (key) {
+        var b = Ka.get(key);
+        if (!b)
+            for (var c = 0; c < xc.length; c++) {
+                var d = xc[c];
+                var e = d[0].exec(key);
+                if (e) {
+                    MTrace("Generating new model field for name: " + key);
+                    b = d[1](e);
+                    Ka.set(b.name, b);
+                    break;
                 }
-            return b
-        },
-        kd = function(a) {
+            }
+        return b;
+    };
+    var kd = function(a) {
             var b;
             Ka.map(function(c, d) {
                 d.i == a && (b = d)
