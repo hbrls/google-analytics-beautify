@@ -874,12 +874,12 @@
         }
     };
     var zc = function(a, b, c, d) {
-            La(b, c);
-            var e = yc(b);
-            e && e.w ? e.w(a, b, c, d) : a.data.set(b, c, d);
-            e || MInfo("Set called on unknown field: %s.", b)
-        },
-        Ac = function(name, shortName, defaultValue, d, e) {
+        La(b, c);
+        var e = yc(b);
+        e && e.w ? e.w(a, b, c, d) : a.data.set(b, c, d);
+        e || MInfo("Set called on unknown field: %s.", b)
+    };
+    var Ac = function(name, shortName, defaultValue, d, e) {
             this.name = name;
             this.i = shortName;
             this.defaultValue = defaultValue;
