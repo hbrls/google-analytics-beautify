@@ -359,14 +359,23 @@
     }
 
     function Xd(a) {
-        for (var b = [], c = 0; c < a.length; c++)
-            for (var d = 0; d < a[c].length - 1; d++) a[c][d] && (b[d] = b[d] || 0, b[d] = a[c][d].length > b[d] ? a[c][d].length : b[d]);
-        for (c = 0; c < a.length; c++) {
-            for (var e = [], d = 0; d < a[c].length; d++) {
-                var f = he(0) + a[c][d];
-                e.push(f + he((b[d] || 0) - f.length))
+        var b = []
+        for (var i = 0; i < a.length; i++) {
+            for (var j = 0; j < a[i].length - 1; j++) {
+                if (a[i][j]) {
+                    b[j] = b[j] || 0;
+                    b[j] = a[i][j].length > b[j] ? a[i][j].length : b[j];
+                }
             }
-            MInfo(e.join(" "))
+        }
+
+        var e = [];
+        for (var i = 0; i < a.length; i++) {
+            for (var j = 0; j < a[i].length; j++) {
+                var f = he(0) + a[i][j];
+                e.push(f + he((b[j] || 0) - f.length));
+            }
+            MInfo(e.join(" "));
         }
     }
 
