@@ -342,14 +342,12 @@
         }
     };
 
-    function Ia(a) {
-        MInfo("\nSent beacon:\n" + a + "\n\n");
+    function Ia(query) {
+        MInfo("\nSent beacon:\n" + query + "\n\n");
         var b = [];
-        a = a.split("&");
-        for (var c = 0; c < a.length; c++) {
-            var d = a[c].split("="),
-                e = d[0],
-                d = d[1];
+        var params = query.split("&");
+        for (var i = 0; i < params.length; i++) {
+            var [e, d] = params[i].split("=");
             if ("_" != e.charAt(0)) {
                 var f = kd(e);
                 f && 0 == f.indexOf("&") && (f = Sd(f) || f);
@@ -357,7 +355,7 @@
             }
         }
         b.sort();
-        Xd(b)
+        Xd(b);
     }
 
     function Xd(a) {
