@@ -84,10 +84,10 @@
         Ea = function(a, b, c) {
             a && (MInfo("Loading script: %s", a), c ? (c = "", b && (g.test(b) ? c = ' id="' + b + '"' : MWarn("Dropping invalid script ID: %s", b)), g.test(a) ? I.write("<script" + c + ' src="' + a + '">\x3c/script>') : MWarn("URL uses invalid characters. Dropping request for: %s",
                 a)) : (c = I.createElement("script"), c.type = "text/javascript", c.async = !0, c.src = a, b && (c.id = b), a = I.getElementsByTagName("script")[0], a.parentNode.insertBefore(c, a)))
-        },
-        df = function() {
-            return "https:" == I.location.protocol
-        },
+        };
+    var isHttps = function() {
+        return "https:" == document.location.protocol;
+    };
         Wb = function() {
             var a = "" + I.location.hostname;
             return 0 == a.indexOf("www.") ? a.substring(4) : a
@@ -598,7 +598,7 @@
         fe = /^(www\.)?google(\.com?)?(\.[a-z]{2})?$/,
         Wd = /(^|\.)doubleclick\.net$/i;
     var hd = function() {
-        return ($b || df() ? "https:" : "http:") + "//www.google-analytics.com"
+        return (forceSSL || isHttps() ? "https:" : "http:") + "//www.google-analytics.com"
     };
     var PayloadTooLargeException = function (dataLength) {
         this.name = "len";
@@ -896,7 +896,7 @@
             MError("Ignored attempt to update read-only property: " + b)
         };
     var libName = isString(window.GoogleAnalyticsObject) && trim(window.GoogleAnalyticsObject) || "ga";
-    var $b = !1;
+    var forceSSL = !1;
     var KEY$apiVersion = X("apiVersion", "v");
     var KEY$clientVersion = X("clientVersion", "_v");
     var KEY$anonymizeIp = W("anonymizeIp", "aip");
@@ -979,10 +979,10 @@
     var KEY$usage = W("usage", "_u");
     var KEY$_um = W("_um");
     var KEY$forceSSL = W("forceSSL", undefined, undefined, function () {
-        return $b
+        return forceSSL
     }, function(a, b, c) {
         F(34);
-        $b = !!c
+        forceSSL = !!c
     }); // ** not used
     var KEY$_j1 = W("_j1", "jid");
     Bc("\\&(.*)", function(a) {
@@ -1039,21 +1039,9 @@
             }
         }
     };
-    var Ie = function() {
-            this.Z = 1E4;
-            this.ja = void 0;
-            this.fa = !1;
-            this.ia = 1
-        },
-        ye = function() {
-            var a = new Ie,
-                b;
-            if (a.ja && a.fa) return 0;
-            a.fa = !0;
-            if (0 == a.Z) return 0;
-            void 0 === b && (b = getRandom());
-            return 0 == b % a.Z ? Math.floor(b / a.Z) % a.ia + 1 : 0
-        };
+    var luckySSL = function () {
+        return 0 == getRandom() % 10000;
+    };
 
     function Qc() {
         var a, b, c;
@@ -1731,7 +1719,7 @@
                     Q[a].push(c);
                     c = w(d)
                 }!c && Se.hasOwnProperty(b) ? (F(39), c = b + ".js") : F(43);
-                c ? (c && 0 <= c.indexOf("/") || (c = ($b || df() ? "https:" : "http:") + "//www.google-analytics.com/plugins/ua/" + c), d = Ue(c), a = d.protocol, c = I.location.protocol, ("https:" == a || a == c || ("http:" != a ? 0 : "http:" == c)) && C(d) ? (MInfo("Loading resource for plugin: " + b), Ea(d.url, void 0, e), Te.set(b, !0)) : MError("Error loading resource for plugin %s: Refusing to load url: %s", b, d.url)) : MInfo("No plugin url set for %s.", b)
+                c ? (c && 0 <= c.indexOf("/") || (c = (forceSSL || isHttps() ? "https:" : "http:") + "//www.google-analytics.com/plugins/ua/" + c), d = Ue(c), a = d.protocol, c = I.location.protocol, ("https:" == a || a == c || ("http:" != a ? 0 : "http:" == c)) && C(d) ? (MInfo("Loading resource for plugin: " + b), Ea(d.url, void 0, e), Te.set(b, !0)) : MError("Error loading resource for plugin %s: Refusing to load url: %s", b, d.url)) : MInfo("No plugin url set for %s.", b)
             }
         },
         y = function(a, b) {
@@ -1915,7 +1903,7 @@
 
             var scripts = document.getElementsByTagName("script");
             var bFlag;
-            if (!df() && !$b) {
+            if (!isHttps() && !forceSSL) {
                 loopLabel: {
                     for (var i = 0; i < scripts.length && 100 > i; i++) {
                         var d = scripts[i].src;
@@ -1929,10 +1917,16 @@
                 }
                 if (bFlag) {
                     MTrace("Analytics.js is secure, forcing SSL for all hits.");
-                    $b = true;
+                    forceSSL = true;
                 }
             }
-            df() || $b || !ye() || (MTrace("Sending all Hits by SSL"), F(36), $b = !0);
+            if (!isHttps && !forceSSL) {
+                if (luckySSL()) {
+                    MTrace("Sending all Hits by SSL");
+                    F(36);
+                    forceSSL = true;
+                }
+            }
             (Q.gaplugins = Q.gaplugins || {}).Linker = pd;
 
             var b3 = pd.prototype;
