@@ -694,25 +694,34 @@
         window.gaData[gaId] = window.gaData[gaId] || {};
         return window.gaData[gaId];
     };
-    var gc = function() {
+    var TrackerFilters = function() {
         this.m = []
     };
-    gc.prototype.add = function(a) {
+    TrackerFilters.prototype.add = function(a) {
         this.m.push(a)
     };
-    gc.prototype.H = function(a) {
-        MTrace("\nExecuting " + this.m.length + " filters:");
+    TrackerFilters.prototype.H = function(a) {
+        MVerbose("\nExecuting " + this.m.length + " filters:");
         try {
-            for (var b = 0; b < this.m.length; b++) {
-                MTrace("  filter[" + b + "]: " + this.m[b]);
-                var c = a.get(this.m[b]);
-                c && isFunction(c) ? c.call(Q, a) : MTrace("  Skipping (no function found.)")
+            for (var i = 0; i < this.m.length; i++) {
+                MTrace("  filter[" + i + "]: " + this.m[i]);
+                var c = a.get(this.m[i]);
+                if (c && isFunction(c)) {
+                    c.call(window, a);
+                } else {
+                    MTrace("  Skipping (no function found.)");
+                }
             }
-        } catch (d) {
-            MTrace("Aborted execution due to exception: " + d)
+        } catch (error) {
+            MTrace("Aborted execution due to exception: " + error);
         }
-        b = a.get(KEY$hitCallback);
-        b != noop && isFunction(b) && (MTrace("Manually firing callback"), a.set(KEY$hitCallback, noop, !0), setTimeout(b, 10))
+
+        var b = a.get(KEY$hitCallback);
+        if (b != noop && isFunction(b)) {
+            MTrace("Manually firing callback");
+            a.set(KEY$hitCallback, noop, true);
+            setTimeout(b, 10);
+        }
     };
 
     function hc(a) {
@@ -1444,7 +1453,7 @@
     var Tracker = function(fieldsObject) {
         var that = this;
         this.a = new wc;
-        this.filters = new gc;
+        this.filters = new TrackerFilters();
 
         function b(key, value) {
             that.a.data.set(key, value);
