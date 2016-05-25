@@ -833,13 +833,13 @@
         }
         a.set(KEY$_hc, ++b)
     };
-    var wc = function() {
-            this.data = new ef;
-            this.data.debug = !0
-        },
-        Ka = new ef,
+    var TrackerStore = function() {
+        this.data = new ef;
+        this.data.debug = true;
+    };
+    var Ka = new ef,
         xc = [];
-    wc.prototype.get = function(a) {
+    TrackerStore.prototype.get = function(a) {
         var b = yc(a);
         var c = this.data.get(a);
 
@@ -869,7 +869,7 @@
             var c = a.get(b);
             return void 0 == c || "" === c ? 0 : 1 * c
         };
-    wc.prototype.set = function(a, b, c) {
+    TrackerStore.prototype.set = function(a, b, c) {
         if (a) {
             if ("object" == typeof a) {
                 for (var k in a) {
@@ -1452,7 +1452,7 @@
     var va = /^(UA|YT|MO|GP)-(\d+)-(\d+)$/;
     var Tracker = function(fieldsObject) {
         var that = this;
-        this.a = new wc;
+        this.a = new TrackerStore();
         this.filters = new TrackerFilters();
 
         function b(key, value) {
