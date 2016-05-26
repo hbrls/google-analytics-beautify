@@ -678,7 +678,7 @@
                 d.push("_m=" + P(message.substring(0, 100)));
             }
             d.push("aip=1");
-            d.push("z=" + ae());
+            d.push("z=" + random());
             sendImage(hd() + "/collect", d.join("&"), noop)
         }
     };
@@ -737,7 +737,7 @@
                 void 0 != e && e != d.defaultValue && ("boolean" == typeof e && (e *= 1), b.push(d.i + "=" + P("" + e)))
             }
         });
-        b.push("z=" + be());
+        b.push("z=" + getRandom());
         a.set(KEY$hitPayload, b.join("&"), !0)
     }
 
@@ -791,18 +791,18 @@
     function ya(a) {
         if (!a.get(KEY$trackingId)) throw MError("Tracking ID not set. Aborting hit."), "abort";
     };
-    var ae = function() {
-            return Math.round(2147483647 * Math.random())
-        },
-        be = function() {
-            try {
-                var a = new Uint32Array(1);
-                Q.crypto.getRandomValues(a);
-                return a[0] & 2147483647
-            } catch (b) {
-                return ae()
-            }
-        };
+    var random = function () {
+        return Math.round(2147483647 * Math.random());
+    };
+    var getRandom = function () {
+        try {
+            var a = new Uint32Array(1);
+            window.crypto.getRandomValues(a);
+            return a[0] & 2147483647;
+        } catch () {
+            return random();
+        }
+    };
 
     function qc(a) {
         var b = jc(a, KEY$_hc);
@@ -1051,7 +1051,7 @@
             if (a.ja && a.fa) return 0;
             a.fa = !0;
             if (0 == a.Z) return 0;
-            void 0 === b && (b = be());
+            void 0 === b && (b = getRandom());
             return 0 == b % a.Z ? Math.floor(b / a.Z) % a.ia + 1 : 0
         };
 
@@ -1360,7 +1360,7 @@
             })
         },
         Je = function(a, b) {
-            b.get(a.Y) ? MWarn("Join id already set") : "1" == Md(a.aa)[0] ? b.set(a.Y, "", !0) : b.set(a.Y, "" + ae(), !0)
+            b.get(a.Y) ? MWarn("Join id already set") : "1" == Md(a.aa)[0] ? b.set(a.Y, "", !0) : b.set(a.Y, "" + random(), !0)
         },
         Ke = function(a, b) {
             b.get(a.Y) && (MInfo("Setting throttling cookie: %s", a.aa), pe(a.aa, "1", b.get(KEY$cookiePath), b.get(KEY$cookieDomain), b.get(KEY$trackingId), 6E5))
@@ -1383,7 +1383,7 @@
                     e += P(a) + "=";
                     e += P("" + b) + "&"
                 });
-                e += "z=" + ae();
+                e += "z=" + random();
                 od(c, e);
                 createImg(e);
                 b.set(a.Y, "", !0)
@@ -1413,7 +1413,7 @@
     };
     var He = function() {
         var a = Q.gaGlobal = Q.gaGlobal || {};
-        return a.hid = a.hid || ae()
+        return a.hid = a.hid || random()
     };
     var Nd, Od = function(a, b, c) {
         if (!Nd) {
@@ -1421,7 +1421,7 @@
             d = I.location.hash;
             var e = Q.name,
                 f = /^#?gaso=([^&]*)/;
-            if (e = (d = (d = d && d.match(f) || e && e.match(f)) ? d[1] : Md("GASO")[0] || "") && d.match(/^(?:!([-0-9a-z.]{1,40})!)?([-.\w]{10,1200})$/i)) pe("GASO", "" + d, c, b, a, 0), window._udo || (window._udo = b), window._utcp || (window._utcp = c), a = e[1], Ea("https://www.google.com/analytics/web/inpage/pub/inpage.js?" + (a ? "prefix=" + a + "&" : "") + ae(), "_gasojs");
+            if (e = (d = (d = d && d.match(f) || e && e.match(f)) ? d[1] : Md("GASO")[0] || "") && d.match(/^(?:!([-0-9a-z.]{1,40})!)?([-.\w]{10,1200})$/i)) pe("GASO", "" + d, c, b, a, 0), window._udo || (window._udo = b), window._utcp || (window._utcp = c), a = e[1], Ea("https://www.google.com/analytics/web/inpage/pub/inpage.js?" + (a ? "prefix=" + a + "&" : "") + random(), "_gasojs");
             Nd = !0
         }
     };
@@ -1535,7 +1535,7 @@
                     c = Q.navigator.userAgent + (I.cookie ? I.cookie : "") + (I.referrer ? I.referrer : "");
                     d = c.length;
                     for (e = Q.history.length; 0 < e;) c += e-- ^ d++;
-                    a.data.set(KEY$clientId, [ae() ^ ic(c) & 2147483647, Math.round((new Date).getTime() / 1E3)].join("."))
+                    a.data.set(KEY$clientId, [random() ^ ic(c) & 2147483647, Math.round((new Date).getTime() / 1E3)].join("."))
                 }
             Yc(a)
         },
