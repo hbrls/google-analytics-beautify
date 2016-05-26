@@ -1073,12 +1073,16 @@
     var KEY$transportUrl = W("transportUrl");
     var KEY$_r = W("_r", "_r");
 
-    function Y(a, b, c, d) {
-        b[a] = function() {
+    function extend(method, target, func, num) {
+        target[method] = function () {
             try {
-                return d && F(d), c.apply(this, arguments)
-            } catch (b) {
-                throw sendError("exc", a, b && b.name), b;
+                if (num) {
+                    F(num);
+                }
+                return func.apply(this, arguments);
+            } catch (error) {
+                sendError("exc", method, error && error.name)
+                throw error;
             }
         }
     };
@@ -1962,21 +1966,21 @@
             Z.loaded = true;
 
             var b = window[libName] = Z;
-            Y("create", b, b.create);
-            Y("remove", b, b.remove);
-            Y("getByName", b, b.getByName, 5);
-            Y("getAll", b, b.getAll, 6);
-            Y("dump", b, b.dump);
+            extend("create", b, b.create);
+            extend("remove", b, b.remove);
+            extend("getByName", b, b.getByName, 5);
+            extend("getAll", b, b.getAll, 6);
+            extend("dump", b, b.dump);
 
             var b1 = ad.prototype;
-            Y("get", b1, b1.get, 7);
-            Y("set", b1, b1.set, 4);
-            Y("send", b1, b1.send);
-            Y("requireSync", b1, b1.pa);
+            extend("get", b1, b1.get, 7);
+            extend("set", b1, b1.set, 4);
+            extend("send", b1, b1.send);
+            extend("requireSync", b1, b1.pa);
 
             var b2 = wc.prototype;
-            Y("get", b2, b2.get);
-            Y("set", b2, b2.set);
+            extend("get", b2, b2.get);
+            extend("set", b2, b2.set);
 
             var scripts = document.getElementsByTagName("script");
             var bFlag;
@@ -2008,8 +2012,8 @@
 
             var b3 = pd.prototype;
             D("linker", pd);
-            Y("decorate", b3, b3.S, 20);
-            Y("autoLink", b3, b3.U, 25);
+            extend("decorate", b3, b3.S, 20);
+            extend("autoLink", b3, b3.U, 25);
             D("displayfeatures", $d);
             D("adfeatures", $d);
 
