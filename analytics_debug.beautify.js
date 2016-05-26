@@ -1741,7 +1741,7 @@
                 Se.hasOwnProperty(b) && F(Se[b]);
                 if (p.test(b)) {
                     F(52);
-                    a = Z.O(a);
+                    a = Z.getByName(a);
                     if (!a) return !0;
                     c = d || {};
                     d = {
@@ -1874,9 +1874,9 @@
     };
     jf.R = function(a) {
         try {
-            if (a.s) a.s.call(Q, Z.O("t0"));
+            if (a.s) a.s.call(Q, Z.getByName("t0"));
             else {
-                var b = a.c == libName ? Z : Z.O(a.c);
+                var b = a.c == libName ? Z : Z.getByName(a.c);
                 if (a.D) "t0" != a.c ? MWarn('Command ignored. Use "create" instead of "%s.create"', a.c) : Z.create.apply(Z, a.b);
                 else if (a.$) Z.remove(a.c);
                 else if (b)
@@ -1906,8 +1906,8 @@
         jf.H.apply(jf, [args]);
         MGroupEnd()
     };
-    Z.o = {};
-    Z.C = [];
+    Z.trackers = {};
+    Z.trackerArr = [];
     Z.h = 0;
     Z.answer = 42;
     var gd = [KEY$trackingId, KEY$cookieDomain, KEY$name];
@@ -1915,31 +1915,31 @@
         var b = Yb(gd, args);
         b[KEY$name] || (b[KEY$name] = "t0");
         var trackerName = "" + b[KEY$name];
-        if (Z.o[trackerName]) {
+        if (Z.trackers[trackerName]) {
             MWarn("Ignoring create request for duplicate tracking name.");
-            return Z.o[trackerName];
+            return Z.trackers[trackerName];
         }
         MInfo("Creating new tracker: " + trackerName);
         var tracker = new Tracker(b);
-        Z.o[trackerName] = tracker;
-        Z.C.push(tracker);
+        Z.trackers[trackerName] = tracker;
+        Z.trackerArr.push(tracker);
         return tracker;
     };
     Z.remove = function(a) {
-        for (var b = 0; b < Z.C.length; b++)
-            if (Z.C[b].get(KEY$name) == a) {
+        for (var b = 0; b < Z.trackerArr.length; b++)
+            if (Z.trackerArr[b].get(KEY$name) == a) {
                 MInfo("Removing tracker: " + a);
-                Z.C.splice(b, 1);
-                Z.o[a] = null;
+                Z.trackerArr.splice(b, 1);
+                Z.trackers[a] = null;
                 return
             }
         MError("Tracker does not exist.")
     };
-    Z.O = function(a) {
-        return Z.o[a]
+    Z.getByName = function(name) {
+        return Z.trackers[name];
     };
     Z.getAll = function() {
-        return Z.C.slice(0)
+        return Z.trackerArr.slice(0)
     };
     Z.P = function() {
         MGroup("Initializing Google Analytics.");
@@ -1957,7 +1957,7 @@
             var b = window[libName] = Z;
             Y("create", b, b.create);
             Y("remove", b, b.remove);
-            Y("getByName", b, b.O, 5);
+            Y("getByName", b, b.getByName, 5);
             Y("getAll", b, b.getAll, 6);
             Y("dump", b, b.dump);
 
