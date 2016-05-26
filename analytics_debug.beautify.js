@@ -505,7 +505,7 @@
         function b(b) {
             isString(a.get(b)) || MError("Missing required field '%s' for hit of type '%s'", b, c)
         }
-        var c = V(a, KEY$hitType);
+        var c = getString(a, KEY$hitType);
         switch (c) {
             case "pageview":
                 b(KEY$location);
@@ -712,11 +712,11 @@
     };
 
     function hc(a) {
-        if (100 != a.get(KEY$sampleRate) && ic(V(a, KEY$clientId)) % 1E4 >= 100 * jc(a, KEY$sampleRate)) throw MInfo("User has been sampled out. Aborting hit."), "abort";
+        if (100 != a.get(KEY$sampleRate) && ic(getString(a, KEY$clientId)) % 1E4 >= 100 * jc(a, KEY$sampleRate)) throw MInfo("User has been sampled out. Aborting hit."), "abort";
     }
 
     function kc(a) {
-        if (ld(V(a, KEY$trackingId))) throw MInfo("User has opted out of tracking. Aborting hit."), "abort";
+        if (ld(getString(a, KEY$trackingId))) throw MInfo("User has opted out of tracking. Aborting hit."), "abort";
     }
 
     function lc() {
@@ -742,17 +742,17 @@
     }
 
     function pc(a) {
-        var b = V(a, KEY$transportUrl) || hd() + "/collect",
-            c = V(a, KEY$transport);
+        var b = getString(a, KEY$transportUrl) || hd() + "/collect",
+            c = getString(a, KEY$transport);
         !c && a.get(KEY$useBeacon) && (c = "beacon");
         if (c) {
-            var d = V(a, KEY$hitPayload),
+            var d = getString(a, KEY$hitPayload),
                 e = a.get(KEY$hitCallback);
             8192 < d.length && MError("Payload size is too large (%s).  Max allowed is %s.", d.length, 8192);
             e = e || noop;
             MInfo("Sending hit with transport method %s", c);
             "image" == c ? (sendImage(b, d, e), Ia(d)) : "xhr" == c && sendXHR(b, d, e) ? Ia(d) : "beacon" == c && sendBeacon(b, d, e) ? Ia(d) : (MInfo("Transport Method, %s, is not supported, falling back to default method.", c), send(b, d, e))
-        } else send(b, V(a, KEY$hitPayload), a.get(KEY$hitCallback));
+        } else send(b, getString(a, KEY$hitPayload), a.get(KEY$hitCallback));
         b = a.get(KEY$trackingId);
         b = getDataByGAId(b);
         c = b.hitcount;
@@ -807,7 +807,7 @@
     function qc(a) {
         var b = jc(a, KEY$_hc);
         500 <= b && (F(15), MInfo("Exceeded maximum number of hits for this page. Try reducing the number of hits being sent."));
-        var c = V(a, KEY$hitType);
+        var c = getString(a, KEY$hitType);
         if ("transaction" != c && "item" != c) {
             var c = jc(a, KEY$_to),
                 d = (new Date).getTime(),
@@ -832,11 +832,15 @@
         b && void 0 == c && (c = isFunction(b.defaultValue) ? b.defaultValue() : b.defaultValue);
         return b && b.v ? b.v(this, a, c) : c
     };
-    var V = function(a, b) {
-            var c = a.get(b);
-            return void 0 == c ? "" : "" + c
-        },
-        jc = function(a, b) {
+    var getString = function(store, key) {
+        var value = store.get(key);
+        if (undefined == value) {
+            return "";
+        } else {
+            return "" + value;
+        }
+    };
+    var jc = function(a, b) {
             var c = a.get(b);
             return void 0 == c || "" === c ? 0 : 1 * c
         };
@@ -1064,7 +1068,7 @@
     };
     var Sc = function(a, b) {
             var c = Math.min(jc(a, KEY$siteSpeedSampleRate), 100);
-            if (ic(V(a, KEY$clientId)) % 100 >= c) MTrace("Site speed data not sent - visitor sampled out");
+            if (ic(getString(a, KEY$clientId)) % 100 >= c) MTrace("Site speed data not sent - visitor sampled out");
             else if (c = {}, qd(c) || rd(c)) {
                 var d = c[KEY$l1];
                 void 0 == d || Infinity == d || isNaN(d) ? MTrace("Site speed data not sent - unsupported browser") : 0 < d ? (Rc(c, KEY$l3), Rc(c, KEY$l6), Rc(c, KEY$l5), Rc(c, KEY$l2), Rc(c, KEY$l4), Rc(c, KEY$l7), Rc(c, KEY$l8), b(c)) : (MTrace("Site speed data not available - waiting for onload"), $on(Q, "load", function() {
@@ -1113,13 +1117,13 @@
         };
     var Tc = !1,
         Yc = function(a) {
-            if ("cookie" == V(a, KEY$storage)) {
-                var b = V(a, KEY$cookieName),
+            if ("cookie" == getString(a, KEY$storage)) {
+                var b = getString(a, KEY$cookieName),
                     c = ie(a),
-                    d = Wc(V(a, KEY$cookiePath)),
-                    e = Xc(V(a, KEY$cookieDomain)),
+                    d = Wc(getString(a, KEY$cookiePath)),
+                    e = Xc(getString(a, KEY$cookieDomain)),
                     f = 1E3 * jc(a, KEY$cookieExpires),
-                    ea = V(a, KEY$trackingId);
+                    ea = getString(a, KEY$trackingId);
                 if ("auto" != e) pe(b, c, d, e, ea, f) && (Tc = !0);
                 else {
                     F(32);
@@ -1135,21 +1139,21 @@
             }
         },
         Zc = function(a) {
-            if ("cookie" == V(a, KEY$storage) && !Tc && (Yc(a), !Tc)) throw MInfo("Storage not available. Aborting hit."), "abort";
+            if ("cookie" == getString(a, KEY$storage) && !Tc && (Yc(a), !Tc)) throw MInfo("Storage not available. Aborting hit."), "abort";
         },
         Kd = function(a) {
             if (a.get(KEY$legacyHistoryImport)) {
                 var b =
-                    V(a, KEY$cookieDomain),
-                    c = V(a, KEY$legacyCookieDomain) || Wb(),
+                    getString(a, KEY$cookieDomain),
+                    c = getString(a, KEY$legacyCookieDomain) || Wb(),
                     d = Jd("__utma", c, b);
                 d && (F(19), a.set(KEY$_utmht, (new Date).getTime(), !0), a.set(KEY$_utma, d.T), (b = Jd("__utmz", c, b)) && d.hash == b.hash && a.set(KEY$_utmz, b.T))
             }
         },
         ie = function(a) {
-            var b = Ae(V(a, KEY$clientId)),
-                c = Xc(V(a, KEY$cookieDomain)).split(".").length;
-            a = Vc(V(a, KEY$cookiePath));
+            var b = Ae(getString(a, KEY$clientId)),
+                c = Xc(getString(a, KEY$cookieDomain)).split(".").length;
+            a = Vc(getString(a, KEY$cookiePath));
             1 < a && (c += "-" + a);
             return ["GA1", c, b].join(".")
         },
@@ -1329,7 +1333,7 @@
     var Fe = function(a, b, c) {
             this.Y = KEY$_j1;
             this.ca = b;
-            (b = c) || (b = (b = V(a, KEY$name)) && "t0" != b ? Pe.test(b) ? "_gat_" + Ae(V(a, KEY$trackingId)) : "_gat_" + Ae(b) : "_gat");
+            (b = c) || (b = (b = getString(a, KEY$name)) && "t0" != b ? Pe.test(b) ? "_gat_" + Ae(getString(a, KEY$trackingId)) : "_gat_" + Ae(b) : "_gat");
             this.aa = b
         },
         Le = function(a, b) {
@@ -1468,11 +1472,11 @@
             MTrace("Initialization complete\n\n")
         },
         vd = function(a, b) {
-            if ("cookie" == V(a, KEY$storage)) {
+            if ("cookie" == getString(a, KEY$storage)) {
                 Tc = !1;
                 var c;
                 b: {
-                    var d = Md(V(a, KEY$cookieName));
+                    var d = Md(getString(a, KEY$cookieName));
                     if (d && !(1 > d.length)) {
                         c = [];
                         for (var e = 0; e < d.length; e++) {
@@ -1493,13 +1497,13 @@
                         if (0 == c.length) F(12);
                         else {
                             F(14);
-                            d = Xc(V(a, KEY$cookieDomain)).split(".").length;
+                            d = Xc(getString(a, KEY$cookieDomain)).split(".").length;
                             c = sd(c, d, 0);
                             if (1 == c.length) {
                                 c = c[0].M;
                                 break b
                             }
-                            d = Vc(V(a, KEY$cookiePath));
+                            d = Vc(getString(a, KEY$cookiePath));
                             c = sd(c, d, 1);
                             c = c[0] && c[0].M;
                             break b
@@ -1507,7 +1511,7 @@
                     }
                     c = void 0
                 }
-                c || (c = V(a, KEY$cookieDomain), d = V(a, KEY$legacyCookieDomain) || Wb(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], MLog("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
+                c || (c = getString(a, KEY$cookieDomain), d = getString(a, KEY$legacyCookieDomain) || Wb(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], MLog("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
                 c && (a.data.set(KEY$clientId, c), Tc = !0)
             }
             c = a.get(KEY$allowAnchor);
