@@ -1272,7 +1272,7 @@
         this.target = a;
         this.X = !1
     };
-    pd.prototype.S = function(a, b) {
+    pd.prototype.decorate = function(a, b) {
         if (a.tagName) {
             if ("a" == a.tagName.toLowerCase()) {
                 a.href && (a.href = le(this, a.href, b));
@@ -1311,7 +1311,7 @@
                     } else "post" == b.method.toLowerCase() ? b.action = le(a, b.action) : MError("Unknown form method %s on %s", b.method, b)
                 } else MError("An action is required for the linker to work.")
         };
-    pd.prototype.U = function(a, b, c) {
+    pd.prototype.autoLink = function(a, b, c) {
         function d(c) {
             try {
                 c = c || Q.event;
@@ -2012,8 +2012,8 @@
 
             var b3 = pd.prototype;
             D("linker", pd);
-            extend("decorate", b3, b3.S, 20);
-            extend("autoLink", b3, b3.U, 25);
+            extend("decorate", b3, b3.decorate, 20);
+            extend("autoLink", b3, b3.autoLink, 25);
             D("displayfeatures", $d);
             D("adfeatures", $d);
 
