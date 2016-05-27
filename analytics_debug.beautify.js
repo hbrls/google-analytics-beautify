@@ -1825,12 +1825,8 @@
                 url: a || ""
             }
         };
-    var jf = {
-        ka: function() {
-            jf.j = []
-        }
-    };
-    jf.ka();
+    var jf = {};
+    jf.j = [];
     jf.H = function(a) {
         var b = jf.N.apply(jf, arguments),
             b = jf.j.concat(b);
