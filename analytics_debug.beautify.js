@@ -1619,7 +1619,7 @@
             }
         };
     var REG_COMMAND = /^(?:(\w+)\.)?(?:(\w+):)?(\w+)$/; // [trackerName.][pluginName:]methodName
-    var se = function (a) {
+    var parseQ = function (a) {
         this.G = a;
         var command = a[0];
         if (isFunction(command)) {
@@ -1807,7 +1807,7 @@
     };
     jf.N = function(a) {
         for (var b = [], c = 0; c < arguments.length; c++) try {
-            var d = new se(arguments[c]);
+            var d = new parseQ(arguments[c]);
             d.f ? (D(d.b[0], d.b[1]), MInfo("Registered new plugin: ga(provide, %s, Function)", d.b[0])) : (d.g && (d.ha = z(d.c, d.b[0], d.da, d.ba)), b.push(d))
         } catch (l) {
             var e = arguments[c],
