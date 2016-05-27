@@ -1831,17 +1831,24 @@
         var b = jf.N.apply(jf, arguments),
             b = jf.j.concat(b);
         for (jf.j = []; 0 < b.length;) {
-            var c;
-            c = b[0];
-            if (c.s) c = "ga(Function)";
-            else {
-                for (var d = [], e = 0; c.G && e < c.G.length; e++) d.push(Fa(c.G[e]));
-                c = "ga(" + d.join(", ") + ")"
+            var c = b[0];
+            var command;
+            if (c.s) {
+                command = "ga(Function)";
+            } else {
+                var d = [];
+                if (c.G) {
+                    for (var e = 0; e < c.G.length; e++) {
+                        d.push(Fa(c.G[e]));
+                    }
+                }
+                command = "ga(" + d.join(", ") + ")";
             }
-            MGroup("Running command: " + c);
-            c = jf.R(b[0]);
+            MGroup("Running command: " + command);
+
+            var ccc = jf.R(b[0]);
             MGroupEnd();
-            if (c) break;
+            if (ccc) break;
             b.shift();
             if (0 < jf.j.length) break
         }
