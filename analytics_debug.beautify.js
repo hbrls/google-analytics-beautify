@@ -1994,7 +1994,7 @@
                     forceSSL = true;
                 }
             }
-            (Q.gaplugins = Q.gaplugins || {}).Linker = pd;
+            (window.gaplugins = window.gaplugins || {}).Linker = pd;
 
             var b3 = pd.prototype;
             D("linker", pd);
