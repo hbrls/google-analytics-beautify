@@ -389,7 +389,18 @@
     }
 
     function Td(a) {
-        for (var b in a) a.hasOwnProperty(b) && (_contains(ac, b) || (yc(b) ? MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', b, a[b]) : MWarn("Create config had an unknown parameter: %s", b)), La(b, a[b]))
+        for (var key in a) {
+            if (a.hasOwnProperty(key)) {
+                if (!_contains(ac, key)) {
+                    if (yc(key)) {
+                        MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', key, a[key]);
+                    } else {
+                        MWarn("Create config had an unknown parameter: %s", key);
+                    }
+                    La(key, a[key]);
+                }
+            }
+        }
     }
 
     function Fa(a, b) {
