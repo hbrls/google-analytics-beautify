@@ -111,12 +111,16 @@
                     break
                 } else e < a.length ? c[a[e]] = b[e] : MWarn("Unrecognized positional argument: " + b[e]);
             return c
-        },
-        Zb = function(a, b) {
-            for (var c = 0; c < a.length; c++)
-                if (b == a[c]) return !0;
-            return !1
         };
+    var _contains = function(arr, target) {
+        for (var i = 0; i < arr.length; i++) {
+            if (target == arr[i]) {
+                return true;
+            }
+        }
+
+        return false;
+    };
     var ef = function() {
         this.keys = [];
         this.values = {};
@@ -378,7 +382,7 @@
     }
 
     function Td(a) {
-        for (var b in a) a.hasOwnProperty(b) && (Zb(ac, b) || (yc(b) ? MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', b, a[b]) : MWarn("Create config had an unknown parameter: %s", b)), La(b, a[b]))
+        for (var b in a) a.hasOwnProperty(b) && (_contains(ac, b) || (yc(b) ? MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', b, a[b]) : MWarn("Create config had an unknown parameter: %s", b)), La(b, a[b]))
     }
 
     function Fa(a, b) {
@@ -590,7 +594,7 @@
             d && "none" != d && (c += "domain=" + d + ";");
             d = I.cookie;
             I.cookie = c;
-            return d != I.cookie || Zb(Md(a), b)
+            return d != I.cookie || _contains(Md(a), b)
         },
         Ae = function(a) {
             return P(a).replace(/\(/g, "%28").replace(/\)/g, "%29")
@@ -1980,7 +1984,7 @@
             var d = a[c].split("="),
                 e = d[0],
                 d = d[1] || "";
-            if (Zb(tc, e)) b.push(Dc(e, d));
+            if (_contains(tc, e)) b.push(Dc(e, d));
             else if ("_ga" == e) {
                 var f = "",
                     ea = "/",
