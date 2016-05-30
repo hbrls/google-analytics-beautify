@@ -808,8 +808,11 @@
         isArray(b) && 0 != b.length && a.set("&did", b.join(","), !0)
     }
 
-    function ya(a) {
-        if (!a.get(KEY$trackingId)) throw MError("Tracking ID not set. Aborting hit."), "abort";
+    function validationTask(a) {
+        if (!a.get(KEY$trackingId)) {
+            MError("Tracking ID not set. Aborting hit.");
+            throw "abort";
+        }
     };
     var random = function () {
         return Math.round(2147483647 * Math.random());
@@ -1499,7 +1502,7 @@
         c(KEY$_oot, kc);
         c(KEY$previewTask, Ud);
         c(KEY$checkProtocolTask, lc);
-        c(KEY$validationTask, ya);
+        c(KEY$validationTask, validationTask);
         c(KEY$checkStorageTask, Zc);
         c(KEY$historyImportTask, Kd);
         c(KEY$samplerTask, hc);
