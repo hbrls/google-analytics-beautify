@@ -88,11 +88,11 @@
     var isHttps = function() {
         return "https:" == document.location.protocol;
     };
-        Wb = function() {
-            var a = "" + I.location.hostname;
-            return 0 == a.indexOf("www.") ? a.substring(4) : a
-        },
-        Xb = function(a) {
+    var getRootDomain = function () {
+        var domain = "" + document.location.hostname;
+        return 0 == domain.indexOf("www.") ? domain.substring(4) : domain;
+    };
+    var Xb = function(a) {
             var b = I.referrer;
             if (/^https?:\/\//i.test(b)) {
                 if (a) return b;
@@ -1191,7 +1191,7 @@
             if (a.get(KEY$legacyHistoryImport)) {
                 var b =
                     getString(a, KEY$cookieDomain),
-                    c = getString(a, KEY$legacyCookieDomain) || Wb(),
+                    c = getString(a, KEY$legacyCookieDomain) || getRootDomain(),
                     d = Jd("__utma", c, b);
                 d && (F(19), a.set(KEY$_utmht, (new Date).getTime(), !0), a.set(KEY$_utma, d.T), (b = Jd("__utmz", c, b)) && d.hash == b.hash && a.set(KEY$_utmz, b.T))
             }
@@ -1215,7 +1215,7 @@
         },
         fd = function() {
             var a = [],
-                b = Wb().split(".");
+                b = getRootDomain().split(".");
             if (4 == b.length) {
                 var c = b[b.length - 1];
                 if (parseInt(c, 10) == c) return ["none"]
@@ -1483,7 +1483,7 @@
         _set(KEY$name, fieldsObject[KEY$name]);
         _set(KEY$trackingId, trim(fieldsObject[KEY$trackingId]));
         _set(KEY$cookieName, fieldsObject[KEY$cookieName]);
-        _set(KEY$cookieDomain, fieldsObject[KEY$cookieDomain] || Wb());
+        _set(KEY$cookieDomain, fieldsObject[KEY$cookieDomain] || getRootDomain());
         _set(KEY$cookiePath, fieldsObject[KEY$cookiePath]);
         _set(KEY$cookieExpires, fieldsObject[KEY$cookieExpires]);
         _set(KEY$legacyCookieDomain, fieldsObject[KEY$legacyCookieDomain]);
@@ -1563,7 +1563,7 @@
                     }
                     c = void 0
                 }
-                c || (c = getString(a, KEY$cookieDomain), d = getString(a, KEY$legacyCookieDomain) || Wb(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], MLog("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
+                c || (c = getString(a, KEY$cookieDomain), d = getString(a, KEY$legacyCookieDomain) || getRootDomain(), c = Jd("__utma", d, c), void 0 != c ? (F(10), d = c.ea[1] + "." + c.ea[2], MLog("Loaded legacy client id from utma cookie: %s (hash=%s)", d, c.hash), c = d) : c = void 0);
                 c && (a.data.set(KEY$clientId, c), Tc = !0)
             }
             c = a.get(KEY$allowAnchor);
