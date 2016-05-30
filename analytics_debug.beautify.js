@@ -391,7 +391,7 @@
     function Td(a) {
         for (var key in a) {
             if (a.hasOwnProperty(key)) {
-                if (!_contains(ac, key)) {
+                if (!_contains(KEYS, key)) {
                     if (yc(key)) {
                         MWarn('This field cannot be set in a create method. Please use ga("set", %s, %s);', key, a[key]);
                     } else {
@@ -1083,7 +1083,25 @@
     var KEY$sampleRate = X("sampleRate", "sf", 100);
     var KEY$siteSpeedSampleRate = X("siteSpeedSampleRate", undefined, 1);
     var KEY$alwaysSendReferrer = X("alwaysSendReferrer", undefined, false);
-    var ac = [KEY$name, KEY$trackingId, KEY$clientId, KEY$clientIdTime, KEY$userId, KEY$cookieName, KEY$cookieDomain, KEY$cookiePath, KEY$cookieExpires, KEY$legacyCookieDomain, KEY$legacyHistoryImport, KEY$allowLinker, KEY$allowAnchor, KEY$sampleRate, KEY$siteSpeedSampleRate, KEY$alwaysSendReferrer, KEY$storage];
+    var KEYS = [
+        KEY$name,
+        KEY$trackingId,
+        KEY$clientId,
+        KEY$clientIdTime,
+        KEY$userId,
+        KEY$cookieName,
+        KEY$cookieDomain,
+        KEY$cookiePath,
+        KEY$cookieExpires,
+        KEY$legacyCookieDomain,
+        KEY$legacyHistoryImport,
+        KEY$allowLinker,
+        KEY$allowAnchor,
+        KEY$sampleRate,
+        KEY$siteSpeedSampleRate,
+        KEY$alwaysSendReferrer,
+        KEY$storage
+    ];
     var KEY$transportUrl = W("transportUrl");
     var KEY$_r = W("_r", "_r");
 
