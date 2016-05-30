@@ -1469,51 +1469,51 @@
         this.a = new TrackerStore();
         this.filters = new TrackerFilters();
 
-        function b(key, value) {
+        function _set(key, value) {
             that.a.data.set(key, value);
         }
 
-        function c(key, value) {
-            b(key, value);
+        function _setFilter(key, value) {
+            _set(key, value);
             that.filters.add(key);
         }
 
         MVerbose("Initializing tracker");
 
-        b(KEY$name, fieldsObject[KEY$name]);
-        b(KEY$trackingId, trim(fieldsObject[KEY$trackingId]));
-        b(KEY$cookieName, fieldsObject[KEY$cookieName]);
-        b(KEY$cookieDomain, fieldsObject[KEY$cookieDomain] || Wb());
-        b(KEY$cookiePath, fieldsObject[KEY$cookiePath]);
-        b(KEY$cookieExpires, fieldsObject[KEY$cookieExpires]);
-        b(KEY$legacyCookieDomain, fieldsObject[KEY$legacyCookieDomain]);
-        b(KEY$legacyHistoryImport, fieldsObject[KEY$legacyHistoryImport]);
-        b(KEY$allowLinker, fieldsObject[KEY$allowLinker]);
-        b(KEY$allowAnchor, fieldsObject[KEY$allowAnchor]);
-        b(KEY$sampleRate, fieldsObject[KEY$sampleRate]);
-        b(KEY$siteSpeedSampleRate, fieldsObject[KEY$siteSpeedSampleRate]);
-        b(KEY$alwaysSendReferrer, fieldsObject[KEY$alwaysSendReferrer]);
-        b(KEY$storage, fieldsObject[KEY$storage]);
-        b(KEY$userId, fieldsObject[KEY$userId]);
-        b(KEY$clientIdTime, fieldsObject[KEY$clientIdTime]);
-        b(KEY$apiVersion, 1);
-        b(KEY$clientVersion, "j43d");
+        _set(KEY$name, fieldsObject[KEY$name]);
+        _set(KEY$trackingId, trim(fieldsObject[KEY$trackingId]));
+        _set(KEY$cookieName, fieldsObject[KEY$cookieName]);
+        _set(KEY$cookieDomain, fieldsObject[KEY$cookieDomain] || Wb());
+        _set(KEY$cookiePath, fieldsObject[KEY$cookiePath]);
+        _set(KEY$cookieExpires, fieldsObject[KEY$cookieExpires]);
+        _set(KEY$legacyCookieDomain, fieldsObject[KEY$legacyCookieDomain]);
+        _set(KEY$legacyHistoryImport, fieldsObject[KEY$legacyHistoryImport]);
+        _set(KEY$allowLinker, fieldsObject[KEY$allowLinker]);
+        _set(KEY$allowAnchor, fieldsObject[KEY$allowAnchor]);
+        _set(KEY$sampleRate, fieldsObject[KEY$sampleRate]);
+        _set(KEY$siteSpeedSampleRate, fieldsObject[KEY$siteSpeedSampleRate]);
+        _set(KEY$alwaysSendReferrer, fieldsObject[KEY$alwaysSendReferrer]);
+        _set(KEY$storage, fieldsObject[KEY$storage]);
+        _set(KEY$userId, fieldsObject[KEY$userId]);
+        _set(KEY$clientIdTime, fieldsObject[KEY$clientIdTime]);
+        _set(KEY$apiVersion, 1);
+        _set(KEY$clientVersion, "j43d");
 
-        c(KEY$_oot, kc);
-        c(KEY$previewTask, Ud);
-        c(KEY$checkProtocolTask, lc);
-        c(KEY$validationTask, validationTask);
-        c(KEY$checkStorageTask, Zc);
-        c(KEY$historyImportTask, Kd);
-        c(KEY$samplerTask, hc);
-        c(KEY$_rlt, qc);
-        c(KEY$ceTask, td);
-        c(KEY$devIdTask, ve);
-        c(KEY$displayFeaturesTask, Me);
-        c(KEY$buildHitTask, mc);
-        c("_dt", nc);
-        c(KEY$sendHitTask, pc);
-        c(KEY$timingTask, ze(this));
+        _setFilter(KEY$_oot, kc);
+        _setFilter(KEY$previewTask, Ud);
+        _setFilter(KEY$checkProtocolTask, lc);
+        _setFilter(KEY$validationTask, validationTask);
+        _setFilter(KEY$checkStorageTask, Zc);
+        _setFilter(KEY$historyImportTask, Kd);
+        _setFilter(KEY$samplerTask, hc);
+        _setFilter(KEY$_rlt, qc);
+        _setFilter(KEY$ceTask, td);
+        _setFilter(KEY$devIdTask, ve);
+        _setFilter(KEY$displayFeaturesTask, Me);
+        _setFilter(KEY$buildHitTask, mc);
+        _setFilter("_dt", nc);
+        _setFilter(KEY$sendHitTask, pc);
+        _setFilter(KEY$timingTask, ze(this));
 
         vd(this.a, fieldsObject[KEY$clientId]);
         wd(this.a);
