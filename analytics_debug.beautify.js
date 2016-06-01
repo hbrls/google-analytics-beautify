@@ -105,12 +105,21 @@
         },
         Yb = function(a, b) {
             if (1 == b.length && null != b[0] && "object" === typeof b[0]) return b[0];
-            for (var c = {}, d = Math.min(a.length + 1, b.length), e = 0; e < d; e++)
-                if ("object" === typeof b[e]) {
-                    for (var f in b[e]) b[e].hasOwnProperty(f) && (c[f] = b[e][f]);
+            var c = {};
+            var d = Math.min(a.length + 1, b.length);
+            for (var i = 0; i < d; i++) {
+                if ("object" === typeof b[i]) {
+                    for (var f in b[i]) b[i].hasOwnProperty(f) && (c[f] = b[i][f]);
                     break
-                } else e < a.length ? c[a[e]] = b[e] : MWarn("Unrecognized positional argument: " + b[e]);
-            return c
+                } else {
+                    if (i < a.length) {
+                        c[a[i]] = b[i];
+                    } else {
+                        MWarn("Unrecognized positional argument: " + b[i]);
+                    }
+                }
+            }
+            return c;
         };
     var _contains = function(arr, target) {
         for (var i = 0; i < arr.length; i++) {
